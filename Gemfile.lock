@@ -1,0 +1,17 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    redcarpet (3.6.0)
+    rouge (4.1.2)
+    tilt (2.2.0)
+
+PLATFORMS
+  arm64-darwin-21
+
+DEPENDENCIES
+  redcarpet (~> 3.6)
+  rouge (~> 4.1)
+  tilt (~> 2.2)
+
+BUNDLED WITH
+   2.3.24
