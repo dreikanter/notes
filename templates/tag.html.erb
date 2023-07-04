@@ -1,0 +1,21 @@
+<main class="my-4">
+  <p class="my-4">Tags:</p>
+  <ul class="list-inline my-4">
+    <% tags.each do |tag| %>
+      <li class="list-inline-item">
+        <a href="/tags/<%= tag %>" class="btn btn-sm <%= tag == current_tag ? "btn-dark" : "btn-outline-secondary" %>"><%= tag %></a>
+      </li>
+    <% end %>
+  </ul>
+  <p class="my-4">Tagged with <a href="/tags/<%= current_tag %>"><%= current_tag %></a>:</p>
+  <ul>
+    <% pages.filter { _1["tags"].include?(current_tag) }.each do |page| %>
+      <li class="my-2">
+        <a href="<%= page["page_path"] %>"><%= page["title"] %></a>
+        <% if page["published_at"] %>
+          <small class="text-muted"><time datetime="<%= page["published_at"].to_time %>"><%= page["published_at"].strftime("%Y/%m/%d") %></time></small>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</main>

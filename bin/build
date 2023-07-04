@@ -1,0 +1,152 @@
+#!/usr/bin/env ruby
+
+require "date"
+require "fileutils"
+require "redcarpet"
+require "rouge"
+require "rouge/plugins/redcarpet"
+require "tilt"
+require "yaml"
+
+NOTES_PATH = File.expand_path(ENV.fetch("NOTES_PATH")) do
+  abort "define NOTES_PATH environment variable to proceed"
+end
+
+NOTES_SITE_ROOT_PATH = ENV["NOTES_SITE_ROOT_PATH"] || "/"
+ROOT_PATH = File.expand_path("../..", __FILE__)
+BUILD_PATH = File.join(ROOT_PATH, "build")
+TEMPLATES_PATH = File.join(ROOT_PATH, "templates")
+
+COMMONS = {
+  site_name: "Alex Musayev Notes",
+  site_root_url: "https://notes.musayev.com/"
+}
+
+def meta(file_name)
+  @meta ||= {}
+  @meta[file_name] ||= load_meta(file_name)
+end
+
+def load_meta(file_name)
+  (frontmatter?(file_name) ? YAML.safe_load(read_file(file_name)) : {}).tap do |metadata|
+    uid = File.basename(file_name, ".*").match(/(^\d+_\d+)/).captures.first
+    metadata["uid"] = uid
+    metadata["short_uid"] ||= uid.gsub(/^\d+_/, "")
+    metadata["tags"] = metadata["tags"] || []
+    metadata["slug"] = slugify(metadata["slug"] || metadata["title"] || metadata["uid"])
+    metadata["published_at"] = parse_published_at(uid)
+  end
+end
+
+def slugify(string)
+  string.strip.downcase.gsub(/[^a-z0-9\s]+/i, " ").strip.gsub(/\s+/, "-")
+end
+
+FRONTMATTER_PATETRN = /\A(---\s*\n.*?\n?)^((---|\.\.\.)\s*$\n?)/m
+
+def frontmatter?(file_name)
+  read_file(file_name).match?(FRONTMATTER_PATETRN)
+end
+
+def public?(file_name)
+  meta(file_name)["public"]
+rescue StandardError => e
+  false
+end
+
+class CustomRender < Redcarpet::Render::HTML
+  include Rouge::Plugins::Redcarpet
+end
+
+def redcarpet_parser
+  Redcarpet::Markdown.new(
+    CustomRender.new(with_toc_data: true),
+    fenced_code_blocks: true,
+    autolink: true,
+    strikethrough: true,
+    space_after_headers: true,
+    highlight: true
+  )
+end
+
+def page_content(file_name)
+  markdown_content = read_file(file_name).gsub(FRONTMATTER_PATETRN, "")
+  redcarpet_parser.render(markdown_content)
+end
+
+def read_file(file_name)
+  files ||= {}
+  files[file_name] ||= File.read(file_name)
+end
+
+def page_file_path(path)
+  File.join(BUILD_PATH, path)
+end
+
+def public_pages(source_dir)
+  Dir.glob("#{source_dir}/**/*.md").filter_map do |source_file|
+    next unless public?(source_file)
+    metadata = meta(source_file)
+    current_slug = metadata["slug"]
+    uid = metadata["uid"]
+
+    metadata.merge(
+      "source_file" => source_file,
+      "page_file" => "#{uid}/#{current_slug}/index.html",
+      "redirect_file" => "#{uid}/index.html",
+      "page_path" => File.join(NOTES_SITE_ROOT_PATH, uid, current_slug),
+      "title" => (metadata["title"] || uid).gsub("`", ""),
+      "content" => page_content(source_file)
+    )
+  end
+end
+
+def parse_published_at(uid)
+  year, month, day = uid.match(/^(\d+)(\d\d)(\d\d)_/).captures
+  Date.new(Integer(year), Integer(month), Integer(day))
+rescue StandardError
+  nil
+end
+
+def render_page(template_name:, path:, locals:)
+  puts "rendering #{path}"
+  page_file_path(path).tap do |path|
+    FileUtils.mkdir_p(File.dirname(path))
+    locals = locals.merge(COMMONS)
+    File.write(path, layout.render(nil, locals) { load_template(template_name).render(nil, locals) })
+  end
+end
+
+def render_redirect(path:, redirect_url:)
+  puts "rendering #{path}"
+  page_file_path(path).tap do |path|
+    FileUtils.mkdir_p(File.dirname(path))
+    File.write(path, load_template("redirect").render(nil, redirect_url: redirect_url))
+  end
+end
+
+def layout
+  @layout ||= load_template("layout")
+end
+
+def load_template(template_name)
+  Tilt::ERBTemplate.new(template_path(template_name))
+end
+
+def template_path(template_name)
+  File.join(TEMPLATES_PATH, "#{template_name}.html.erb")
+end
+
+pages = public_pages(NOTES_PATH)
+tags = pages.map { _1["tags"] }.flatten.uniq
+
+pages.each do |locals|
+  render_page(template_name: "page", path: locals["page_file"], locals: locals)
+  render_redirect(path: locals["redirect_file"], redirect_url: locals["page_path"])
+end
+
+tags.each do |tag|
+  render_page(template_name: "tag", path: "tags/#{tag}/index.html", locals: {pages: pages, tags: tags, current_tag: tag})
+end
+
+render_page(template_name: "index", path: "index.html", locals: {pages: pages, tags: tags})

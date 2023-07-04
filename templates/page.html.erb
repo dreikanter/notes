@@ -1,0 +1,14 @@
+<header class="my-4">
+  <h1 class="h3"><a href="<%= page_path %>"><%= title %></a></h1>
+</header>
+
+<main class="my-4">
+  <%= content %>
+  <% if tags.any? %>
+    <ul class="list-inline my-4">
+      <% tags.each do |tag| %>
+        <li class="list-inline-item"><a href="/tags/<%= tag %>" class="btn btn-sm btn-outline-secondary"><%= tag %></a></li>
+      <% end %>
+    </ul>
+  <% end %>
+</main>
