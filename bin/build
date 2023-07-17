@@ -113,7 +113,7 @@ def render_page(template_name:, path:, locals:)
   page_file_path(path).tap do |path|
     FileUtils.mkdir_p(File.dirname(path))
     locals = locals.merge(COMMONS)
-    File.write(path, layout.render(nil, locals) { load_template(template_name).render(nil, locals) })
+    File.write(path, render(template_name: "layout", locals: locals) { render(template_name: template_name, locals: locals) })
   end
 end
 
@@ -121,16 +121,17 @@ def render_redirect(path:, redirect_url:)
   puts "rendering #{path}"
   page_file_path(path).tap do |path|
     FileUtils.mkdir_p(File.dirname(path))
-    File.write(path, load_template("redirect").render(nil, redirect_url: redirect_url))
+    File.write(path, render(template_name: "redirect", locals: {redirect_url: redirect_url}))
   end
 end
 
-def layout
-  @layout ||= load_template("layout")
+def render(template_name:, locals: {}, &block)
+  template(template_name).render(nil, locals, &block)
 end
 
-def load_template(template_name)
-  Tilt::ERBTemplate.new(template_path(template_name))
+def template(template_name)
+  @templates ||= {}
+  @templates[template_name] ||= Tilt::ERBTemplate.new(template_path(template_name))
 end
 
 def template_path(template_name)
