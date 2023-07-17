@@ -75,8 +75,8 @@ def page_content(file_name)
 end
 
 def read_file(file_name)
-  files ||= {}
-  files[file_name] ||= File.read(file_name)
+  @files ||= {}
+  @files[file_name] ||= File.read(file_name)
 end
 
 def page_file_path(path)
