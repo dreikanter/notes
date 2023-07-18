@@ -108,24 +108,20 @@ rescue StandardError
   nil
 end
 
-def render_page(template_name:, path:, locals:)
+def render(template_name, path:, locals:, layout: nil)
   puts "rendering #{path}"
   page_file_path(path).tap do |path|
     FileUtils.mkdir_p(File.dirname(path))
-    locals = locals.merge(COMMONS)
-    File.write(path, render(template_name: "layout", locals: locals) { render(template_name: template_name, locals: locals) })
+    File.write(path, render_with_optional_layout(template_name, layout, locals.merge(COMMONS)))
   end
 end
 
-def render_redirect(path:, redirect_url:)
-  puts "rendering #{path}"
-  page_file_path(path).tap do |path|
-    FileUtils.mkdir_p(File.dirname(path))
-    File.write(path, render(template_name: "redirect", locals: {redirect_url: redirect_url}))
-  end
+def render_with_optional_layout(template_name, layout_name, locals)
+  html = render_template(template_name, locals)
+  layout_name ? render_template(layout_name, locals) { html } : html
 end
 
-def render(template_name:, locals: {}, &block)
+def render_template(template_name, locals = {}, &block)
   template(template_name).render(nil, locals, &block)
 end
 
@@ -142,12 +138,12 @@ pages = public_pages(NOTES_PATH)
 tags = pages.map { _1["tags"] }.flatten.uniq
 
 pages.each do |locals|
-  render_page(template_name: "page", path: locals["page_file"], locals: locals)
-  render_redirect(path: locals["redirect_file"], redirect_url: locals["page_path"])
+  render("page", layout: "layout", path: locals["page_file"], locals: locals)
+  render("redirect", path: locals["redirect_file"], locals: {redirect_url: locals["page_path"]})
 end
 
 tags.each do |tag|
-  render_page(template_name: "tag", path: "tags/#{tag}/index.html", locals: {pages: pages, tags: tags, current_tag: tag})
+  render("tag", layout: "layout", path: "tags/#{tag}/index.html", locals: {pages: pages, tags: tags, current_tag: tag})
 end
 
-render_page(template_name: "index", path: "index.html", locals: {pages: pages, tags: tags})
+render("index", layout: "layout", path: "index.html", locals: {pages: pages, tags: tags})
