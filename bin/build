@@ -6,6 +6,7 @@ require "redcarpet"
 require "rouge"
 require "rouge/plugins/redcarpet"
 require "tilt"
+require "uri"
 require "yaml"
 
 NOTES_PATH = File.expand_path(ENV.fetch("NOTES_PATH")) do

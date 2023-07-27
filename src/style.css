@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind typography;
+
+@layer base {
+  pre.highlight {
+    @apply px-4 py-2 rounded-md border border-slate-200;
+  }
+
+  .highlight {
+    @apply rounded-md;
+  }
+}
