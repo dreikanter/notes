@@ -1,14 +1,13 @@
-<h1><a href="<%= page_path %>"><%= title %></a></h1>
+<h1 class="!my-8"><a href="<%= page_path %>" class="no-underline"><%= title %></a></h1>
 
 <%= content %>
 
 <hr class="!my-8">
 
 <% if tags.any? %>
-  <p>Tags:</p>
-  <div class="flex flex-row flex-wrap items-stretch">
+  <div class="flex flex-row flex-wrap items-stretch !my-8">
     <% tags.each do |tag| %>
-      <a href="/tags/<%= tag %>" class="block border rounded-sm py-0 px-2 mb-2 mr-2 no-underline font-normal bg-slate-100 text-slate-800 border-slate-200"><%= tag %></a>
+      <a href="/tags/<%= tag %>" class="block border rounded-md py-0 px-2 my-1 mr-2 no-underline font-normal bg-slate-100 !text-slate-800 border-slate-200"><%= tag %></a>
     <% end %>
   </div>
 <% end %>
