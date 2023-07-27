@@ -14,7 +14,7 @@ end
 
 NOTES_SITE_ROOT_PATH = ENV["NOTES_SITE_ROOT_PATH"] || "/"
 ROOT_PATH = File.expand_path("../..", __FILE__)
-BUILD_PATH = File.join(ROOT_PATH, "build")
+BUILD_PATH = File.join(ROOT_PATH, "dist")
 TEMPLATES_PATH = File.join(ROOT_PATH, "templates")
 
 COMMONS = {
@@ -56,6 +56,11 @@ end
 
 class CustomRender < Redcarpet::Render::HTML
   include Rouge::Plugins::Redcarpet
+
+  # def image(link, title, alt_text)
+  #   new_link = ""
+  #   super(new_link, title, alt_text)
+  # end
 end
 
 def redcarpet_parser
@@ -137,9 +142,10 @@ end
 pages = public_pages(NOTES_PATH)
 tags = pages.map { _1["tags"] }.flatten.uniq
 
-pages.each do |locals|
-  render("page", layout: "layout", path: locals["page_file"], locals: locals)
-  render("redirect", path: locals["redirect_file"], locals: {redirect_url: locals["page_path"]})
+pages.each do |page|
+  related_pages = pages.filter { _1["uid"] != page["uid"] && _1["tags"].intersect?(page["tags"]) }
+  render("page", layout: "layout", path: page["page_file"], locals: page.merge(related_pages: related_pages))
+  render("redirect", path: page["redirect_file"], locals: {redirect_url: page["page_path"]})
 end
 
 tags.each do |tag|

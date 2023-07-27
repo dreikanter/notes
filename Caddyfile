@@ -1,0 +1,4 @@
+localhost:8001 {
+  root * ./dist
+  file_server browse
+}
