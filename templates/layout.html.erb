@@ -22,11 +22,12 @@
     <main>
       <%= yield %>
     </main>
-    <footer>
-      <% if locals["published_at"] %>
-        <small><%= published_at.strftime("%e %b %Y") %></small>
-      <% end %>
-    </footer>
+    <% if locals["published_at"] %>
+      <footer>
+        <hr class="!my-8">
+        <p class="text-slate-400"><%= published_at.strftime("%e %b %Y") %></p>
+      </footer>
+    <% end %>
   </div>
 </body>
 </html>
