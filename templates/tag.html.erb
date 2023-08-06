@@ -6,7 +6,7 @@
   </div>
   <p>Tagged with <a href="/tags/<%= current_tag %>"><%= current_tag %></a>:</p>
   <ul>
-    <% pages.filter { _1["tags"].include?(current_tag) && !_1["hide_from_toc"] }.each do |page| %>
+    <% pages.filter { _1["tags"].include?(current_tag) && !_1["hide_from_toc"] }.sort_by { _1["published_at"].to_time }.reverse.each do |page| %>
       <li>
         <a href="<%= page["page_path"] %>"><%= page["title"] %></a>
         <% if page["published_at"] %>
