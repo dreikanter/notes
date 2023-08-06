@@ -109,7 +109,7 @@ end
 
 def parse_published_at(uid)
   year, month, day = uid.match(/^(\d+)(\d\d)(\d\d)_/).captures
-  Date.new(Integer(year), Integer(month), Integer(day))
+  Date.new(Integer(year), Integer(month.gsub(/^0+/, "")), Integer(day.gsub(/^0+/, "")))
 rescue StandardError
   nil
 end
