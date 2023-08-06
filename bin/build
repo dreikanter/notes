@@ -128,7 +128,7 @@ def render_with_optional_layout(template_name, layout_name, locals)
 end
 
 def render_template(template_name, locals = {}, &block)
-  template(template_name).render(nil, locals, &block)
+  template(template_name).render(nil, locals.transform_keys(&:to_s), &block)
 end
 
 def template(template_name)
@@ -150,7 +150,7 @@ pages.each do |page|
 end
 
 tags.each do |tag|
-  render("tag", layout: "layout", path: "tags/#{tag}/index.html", locals: {pages: pages, tags: tags, current_tag: tag})
+  render("tag", layout: "layout", path: "tags/#{tag}/index.html", locals: {pages: pages, tags: tags, current_tag: tag, title: "##{tag}"})
 end
 
 render("index", layout: "layout", path: "index.html", locals: {pages: pages, tags: tags})
