@@ -4,7 +4,7 @@
     "@tailwindcss/typography": "^0.5.9"
   },
   "scripts": {
-    "build": "npx tailwindcss -i ./src/style.css -o ./dist/style.css --minify",
-    "watch": "npx tailwindcss -i ./src/style.css -o ./dist/style.css --watch"
+    "build": "npx tailwindcss -i ./stylesheets/style.css -o ./dist/style.css --minify",
+    "watch": "npx tailwindcss -i ./stylesheets/style.css -o ./dist/style.css --watch"
   }
 }
