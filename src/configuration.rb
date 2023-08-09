@@ -6,6 +6,7 @@ class Configuration
 
   def initialize(file_name)
     @file_name = file_name.to_s
+    @root_path |= File.dirname(file_name)
   end
 
   def notes_path
@@ -40,10 +41,6 @@ class Configuration
 
   def expand_path(key)
     File.expand_path(fetch(key), root_path)
-  end
-
-  def root_path
-    @root_path ||= File.dirname(file_name)
   end
 
   def fetch(key)
