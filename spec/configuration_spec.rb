@@ -11,4 +11,5 @@ RSpec.describe Configuration do
   it { expect(configuration.site_root_url).to eq("https://notes.musayev.com") }
   it { expect(configuration.site_name).to eq("Alex Musayev Notes") }
   it { expect(configuration.author_name).to eq("Alex Musayev") }
+  it { expect(configuration.site_root_path).to eq("/") }
 end

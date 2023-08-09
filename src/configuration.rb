@@ -1,3 +1,4 @@
+require "uri"
 require "yaml"
 
 class Configuration
@@ -21,6 +22,10 @@ class Configuration
 
   def site_root_url
     fetch("site_root_url").gsub(/\/$/, "")
+  end
+
+  def site_root_path
+    URI.parse(fetch("site_root_url")).path.then { _1.empty? ? "/" : _1 }
   end
 
   def site_name
