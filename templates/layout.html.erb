@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="author" content="<%= configuration.author_name %>">
   <meta name="description" content="" />
-  <title><%= [locals["title"], site_name].compact.join(" - ") %></title>
+  <title><%= [locals["title"], configuration.site_name].compact.join(" - ") %></title>
+  <link rel="alternate" type="application/rss+xml" title="<%= configuration.site_name %>" href="<%= configuration.site_root_url %>/feed.xml">
   <link rel="icon" href="data:," />
   <link href="/style.css" rel="stylesheet" type="text/css">
   <style>
@@ -13,11 +15,12 @@
       Rouge::Themes::Github.render(scope: ".highlight")
     %>
   </style>
+  <script src="https://cdn.counter.dev/script.js" data-id="d94a1231-14bd-47f9-ad32-cf1a9b40d2a5" data-utcoffset="2"></script>
 </head>
 <body>
   <div class="prose prose-slate lg:prose-lg prose-h1:text-4xl prose-headings:font-semibold prose-a:text-sky-800 container mx-auto !px-4 !py-4">
     <nav class="!my-8">
-      <a href="<%= URI.parse(site_root_url).path %>"><%= site_name %></a>
+      <a href="<%= configuration.site_root_path %>"><%= configuration.site_name %></a>
     </nav>
     <main>
       <%= yield %>

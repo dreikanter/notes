@@ -1,0 +1,36 @@
+require:
+  - standard
+  - rubocop-rspec
+
+inherit_gem:
+  standard: config/base.yml
+
+AllCops:
+  TargetRubyVersion: 3.2
+  NewCops: enable
+  DisplayCopNames: true
+  Exclude:
+    - "bin/*"
+    - "db/**/*"
+    - "tmp/**/*"
+    - "node_modules/**/*"
+    - "vendor/bundle/**/*"
+
+Style/RescueStandardError:
+  EnforcedStyle: explicit
+
+#
+# RSpec
+#
+
+RSpec/ExampleLength:
+  Max: 10
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
+
+RSpec/MultipleExpectations:
+  Max: 3
+
+RSpec/MessageSpies:
+  Enabled: false

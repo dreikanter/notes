@@ -13,3 +13,8 @@ Note file name format is `YYYYMMDD_NNNN.md`, where
 
 - `YYYYMMDD` — note creation date.
 - `NNNN` — unique number with zero indentation, preventing note id collisions.
+
+Frontend assets:
+
+- `yarn` — install frontend dependencies.
+- `yarn build` — build stylesheets.
