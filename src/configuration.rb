@@ -6,7 +6,7 @@ class Configuration
 
   def initialize(file_name)
     @file_name = file_name.to_s
-    @root_path |= File.dirname(file_name)
+    @root_path ||= File.dirname(file_name)
   end
 
   def notes_path
