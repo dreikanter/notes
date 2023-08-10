@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title><%= configuration.site_name %></title>
+    <link><%= configuration.site_root_url %></link>
+    <atom:link href="<%= configuration.feed_url %>" rel="self" type="application/rss+xml" />
+    <description></description>
+    <% pages.filter { !_1["hide_from_toc"] }.sort_by { _1["published_at"].to_time }.reverse.each do |page| %>
+    <item>
+      <title><%= page["title"] %></title>
+      <link><%= "#{configuration.site_root_url}#{page["page_path"]}" %></link>
+      <guid><%= "#{configuration.site_root_url}#{page["page_path"]}" %></guid>
+      <description><![CDATA[<%= page["content"] %>]]></description>
+    </item>
+    <% end %>
+  </channel>
+</rss>

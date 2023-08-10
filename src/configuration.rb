@@ -37,6 +37,14 @@ class Configuration
     fetch("author_name")
   end
 
+  def feed_url
+    "#{site_root_url}#{feed_path}"
+  end
+
+  def feed_path
+    File.join(site_root_path, "feed.xml")
+  end
+
   private
 
   def expand_path(key)

@@ -33,6 +33,8 @@ class SiteBuilder
     end
 
     render("index.html", layout: "layout.html", path: "index.html", locals: {pages: pages, tags: tags})
+
+    render("feed.xml", path: "feed.xml", locals: {pages: pages, tags: tags})
   end
 
   private
