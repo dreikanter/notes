@@ -6,7 +6,7 @@
   <meta name="author" content="<%= configuration.author_name %>">
   <meta name="description" content="" />
   <title><%= [locals["title"], configuration.site_name].compact.join(" - ") %></title>
-  <link rel="alternate" type="application/rss+xml" title="<%= configuration.site_name %>" href="<%= configuration.site_root_url %>/feed.xml">
+  <link rel="alternate" type="application/rss+xml" title="<%= configuration.site_name %>" href="<%= configuration.feed_url %>">
   <link rel="icon" href="data:," />
   <link href="/style.css" rel="stylesheet" type="text/css">
   <style>
@@ -25,12 +25,13 @@
     <main>
       <%= yield %>
     </main>
-    <% if locals["published_at"] %>
-      <footer>
-        <hr class="!my-8">
-        <p class="text-slate-400"><%= published_at.strftime("%e %b %Y") %></p>
-      </footer>
-    <% end %>
+    <footer>
+      <hr class="!my-8">
+      <p class="not-prose text-slate-400">
+        <% if locals["published_at"] %><%= published_at.strftime("%e %b %Y") %> &middot;<% end %>
+        <a href="<%= configuration.feed_path %>">RSS</a>
+      </p>
+    </footer>
   </div>
 </body>
 </html>

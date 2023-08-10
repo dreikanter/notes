@@ -12,4 +12,6 @@ RSpec.describe Configuration do
   it { expect(configuration.site_name).to eq("Alex Musayev Notes") }
   it { expect(configuration.author_name).to eq("Alex Musayev") }
   it { expect(configuration.site_root_path).to eq("/") }
+  it { expect(configuration.feed_url).to eq("https://notes.musayev.com/feed.xml") }
+  it { expect(configuration.feed_path).to eq("/feed.xml") }
 end

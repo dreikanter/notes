@@ -24,15 +24,17 @@ class SiteBuilder
 
     pages.each do |page|
       related_pages = pages.filter { _1["uid"] != page["uid"] && _1["tags"].intersect?(page["tags"]) }
-      render("page", layout: "layout", path: page["page_file"], locals: page.merge(related_pages: related_pages))
-      render("redirect", path: page["redirect_file"], locals: {redirect_url: page["page_path"]})
+      render("page.html", layout: "layout.html", path: page["page_file"], locals: page.merge(related_pages: related_pages))
+      render("redirect.html", path: page["redirect_file"], locals: {redirect_url: page["page_path"]})
     end
 
     tags.each do |tag|
-      render("tag", layout: "layout", path: "tags/#{tag}/index.html", locals: {pages: pages, tags: tags, current_tag: tag, title: "##{tag}"})
+      render("tag.html", layout: "layout.html", path: "tags/#{tag}/index.html", locals: {pages: pages, tags: tags, current_tag: tag, title: "##{tag}"})
     end
 
-    render("index", layout: "layout", path: "index.html", locals: {pages: pages, tags: tags})
+    render("index.html", layout: "layout.html", path: "index.html", locals: {pages: pages, tags: tags})
+
+    render("feed.xml", path: "feed.xml", locals: {pages: pages, tags: tags})
   end
 
   private
@@ -151,7 +153,7 @@ class SiteBuilder
   end
 
   def template_path(template_name)
-    File.join(configuration.templates_path, "#{template_name}.html.erb")
+    File.join(configuration.templates_path, "#{template_name}.erb")
   end
 end
 
