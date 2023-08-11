@@ -2,15 +2,15 @@ require "pathname"
 
 module PathHelpers
   def file_fixture(fixture_name)
-    Pathname.new(File.join(file_fixture_path, fixture_name))
+    file_fixture_path.join(fixture_name)
   end
 
   def file_fixture_path
-    File.join(root_path, "spec/fixtures/files")
+    root_path.join("spec/fixtures/files")
   end
 
   def root_path
-    File.expand_path(".")
+    Pathname.new(File.expand_path("."))
   end
 end
 
