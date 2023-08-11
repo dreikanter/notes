@@ -13,6 +13,7 @@
 # it.
 #
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+require "pry"
 require "./spec/support/path_helpers"
 
 RSpec.configure do |config|
