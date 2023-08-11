@@ -1,27 +1,29 @@
-<h1 class="!my-8 !leading-tight"><a href="<%= page_path %>" class="no-underline"><%= title %></a></h1>
+<h1 class="!my-8 !leading-tight"><a href="<%= page.public_path %>" class="no-underline"><%= page.title %></a></h1>
 
-<%= content %>
+<%= page.body %>
 
-<% if tags.any? %>
+<% if page.tags.any? %>
   <hr class="!my-8">
   <div class="flex flex-row flex-wrap items-stretch !my-8">
-    <% tags.each do |tag| %>
+    <% page.tags.each do |tag| %>
       <a href="/tags/<%= tag %>" class="block border rounded-md py-0 px-2 my-1 mr-2 no-underline font-normal bg-slate-100 !text-slate-800 border-slate-200"><%= tag %></a>
     <% end %>
   </div>
 <% end %>
 
-<% if related_pages.any? %>
-  <hr class="!my-8">
-  <p>Somewhat related:</p>
-  <ul>
-    <% related_pages.each do |page| %>
-      <li>
-        <a href="<%= page["page_path"] %>"><%= page["title"] %></a>
-        <% if page["published_at"] %>
-          <small><time datetime="<%= page["published_at"].to_time %>" class="text-slate-400"><%= page["published_at"].strftime("%Y/%m/%d") %></time></small>
-        <% end %>
-      </li>
-    <% end %>
-  </ul>
+<% site.related_to(page).tap do |related_pages| %>
+  <% if related_pages.any? %>
+    <hr class="!my-8">
+    <p>Somewhat related:</p>
+    <ul>
+      <% related_pages.each do |page| %>
+        <li>
+          <a href="<%= page.public_path %>"><%= page.title %></a>
+          <% if page.published_at %>
+            <small><time datetime="<%= page.published_at.to_time %>" class="text-slate-400"><%= page.published_at.strftime("%Y/%m/%d") %></time></small>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
 <% end %>
