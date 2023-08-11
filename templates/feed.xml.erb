@@ -5,12 +5,12 @@
     <link><%= configuration.site_root_url %></link>
     <atom:link href="<%= configuration.feed_url %>" rel="self" type="application/rss+xml" />
     <description></description>
-    <% pages.filter { !_1["hide_from_toc"] }.sort_by { _1["published_at"].to_time }.reverse.each do |page| %>
+    <% site.toc_pages.each do |page| %>
     <item>
-      <title><%= page["title"] %></title>
-      <link><%= "#{configuration.site_root_url}#{page["page_path"]}" %></link>
-      <guid><%= "#{configuration.site_root_url}#{page["page_path"]}" %></guid>
-      <description><![CDATA[<%= page["content"] %>]]></description>
+      <title><%= page.title %></title>
+      <link><%= page.url %></link>
+      <guid><%= page.uid %></guid>
+      <description><![CDATA[<%= page.body %>]]></description>
     </item>
     <% end %>
   </channel>
