@@ -26,7 +26,7 @@ class Site
   end
 
   def tagged_pages(tag)
-    pages.filter { _1.tags.include?(tag) && !_1.hide_from_toc? }.sort_by { _1.published_at }.reverse
+    toc_pages.filter { _1.tags.include?(tag) }
   end
 
   private
