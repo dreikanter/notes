@@ -8,7 +8,13 @@ class Site
   end
 
   def pages
-    @pages ||= note_files.map { Page.new(source_file: _1, configuration: configuration) }.filter(&:public?)
+    @pages ||= note_files
+      .map { Page.new(source_file: _1, configuration: configuration) }
+      .filter(&:public?).sort_by(&:published_at).reverse
+  end
+
+  def toc_pages
+    pages.reject(&:hide_from_toc?)
   end
 
   def tags

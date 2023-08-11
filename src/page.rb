@@ -61,6 +61,10 @@ class Page < BasicPage
     metadata["hide_from_toc"]
   end
 
+  def url
+    File.join(configuration.site_root_url, public_path)
+  end
+
   private
 
   def parse_published_at

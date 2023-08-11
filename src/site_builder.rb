@@ -5,6 +5,7 @@ require "yaml"
 
 require_relative "./site"
 require_relative "./tag_page"
+require_relative "./root_page"
 
 class SiteBuilder
   attr_reader :configuration
@@ -24,9 +25,8 @@ class SiteBuilder
       render("tag.html", layout: "layout.html", path: "tags/#{tag}/index.html", locals: locals(page: TagPage.new(tag), current_tag: tag))
     end
 
-    # render("index.html", layout: "layout.html", path: "index.html", locals: {pages: pages, tags: tags, configuration: configuration, site: site})
-
-    # render("feed.xml", path: "feed.xml", locals: {pages: pages, tags: tags, configuration: configuration, site: site})
+    render("index.html", layout: "layout.html", path: "index.html", locals: locals(page: RootPage.new))
+    render("feed.xml", path: "feed.xml", locals: locals)
   end
 
   private

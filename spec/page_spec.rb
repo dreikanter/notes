@@ -20,6 +20,8 @@ RSpec.describe Page do
     it { expect(page.redirect_file).to eq("20230811_0001/index.html") }
     it { expect(page.public_path).to eq("/20230811_0001/sample-slug") }
     it { expect(page.title).to eq("Page title") }
+    it { expect(page).not_to be_hide_from_toc }
+    it { expect(page.url).to eq("https://notes.musayev.com/20230811_0001/sample-slug") }
   end
 
   context "with no frontmatter" do
@@ -36,5 +38,13 @@ RSpec.describe Page do
     it { expect(page.redirect_file).to eq("20230811_0002/index.html") }
     it { expect(page.public_path).to eq("/20230811_0002/") }
     it { expect(page.title).to eq("20230811_0002") }
+    it { expect(page).not_to be_hide_from_toc }
+    it { expect(page.url).to eq("https://notes.musayev.com/20230811_0002/") }
+  end
+
+  context "when page is hidden from TOC" do
+    let(:source_file) { file_fixture("sample_pages/20230811_0003_hidden.md") }
+
+    it { expect(page).to be_hide_from_toc }
   end
 end
