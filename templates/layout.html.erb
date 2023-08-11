@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="author" content="<%= configuration.author_name %>">
   <meta name="description" content="" />
-  <title><%= [locals["title"], configuration.site_name].compact.join(" - ") %></title>
+  <title><%= [page.title, configuration.site_name].compact.join(" - ") %></title>
   <link rel="alternate" type="application/rss+xml" title="<%= configuration.site_name %>" href="<%= configuration.feed_url %>">
   <link rel="icon" href="data:," />
   <link href="/style.css" rel="stylesheet" type="text/css">
@@ -28,7 +28,7 @@
     <footer>
       <hr class="!my-8">
       <p class="not-prose text-slate-400">
-        <% if locals["published_at"] %><%= published_at.strftime("%e %b %Y") %> &middot;<% end %>
+        <% if page.published_at %><%= page.published_at.strftime("%e %b %Y") %> &middot;<% end %>
         <a href="<%= configuration.feed_path %>">RSS</a>
       </p>
     </footer>

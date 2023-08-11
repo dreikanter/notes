@@ -14,7 +14,7 @@ RSpec.describe Page do
     it { expect(page.short_uid).to eq("0001") }
     it { expect(page.slug).to eq("sample-slug") }
     it { expect(page.tags).to eq(["banana", "coconut"]) }
-    it { expect(page.published_at).to eq(Date.parse("2023-08-11")) }
+    it { expect(page.published_at).to eq(Date.parse("2023-08-11").to_time) }
     it { expect(page.body).to eq("<p>Sample content</p>\n") }
     it { expect(page.page_file).to eq("20230811_0001/sample-slug/index.html") }
     it { expect(page.redirect_file).to eq("20230811_0001/index.html") }
@@ -30,7 +30,7 @@ RSpec.describe Page do
     it { expect(page.short_uid).to eq("0002") }
     it { expect(page.slug).to be_empty }
     it { expect(page.tags).to be_empty }
-    it { expect(page.published_at).to eq(Date.parse("2023-08-11")) }
+    it { expect(page.published_at).to eq(Date.parse("2023-08-11").to_time) }
     it { expect(page.body).to eq("<p>Sample content</p>\n") }
     it { expect(page.page_file).to eq("20230811_0002/index.html") }
     it { expect(page.redirect_file).to eq("20230811_0002/index.html") }

@@ -19,6 +19,10 @@ class Site
     pages.filter { _1.uid != page.uid && _1.tags.intersect?(page.tags) }
   end
 
+  def tagged_pages(tag)
+    pages.filter { _1.tags.include?(tag) && !_1.hide_from_toc? }.sort_by { _1.published_at }.reverse
+  end
+
   private
 
   def note_files

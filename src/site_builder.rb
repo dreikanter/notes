@@ -4,6 +4,7 @@ require "uri"
 require "yaml"
 
 require_relative "./site"
+require_relative "./tag_page"
 
 class SiteBuilder
   attr_reader :configuration
@@ -13,18 +14,15 @@ class SiteBuilder
   end
 
   def build
-    site = Site.new(configuration)
-    commons = {site: site, configuration: configuration}
-
     site.pages.each do |page|
       related_pages = site.related_to(page)
-      render("page.html", layout: "layout.html", path: page.page_file, locals: commons.merge(page: page, related_pages: related_pages))
-      render("redirect.html", path: page.redirect_file, locals: commons.merge(page: page))
+      render("page.html", layout: "layout.html", path: page.page_file, locals: locals(page: page, related_pages: related_pages))
+      render("redirect.html", path: page.redirect_file, locals: locals(page: page))
     end
 
-    # tags.each do |tag|
-    #   render("tag.html", layout: "layout.html", path: "tags/#{tag}/index.html", locals: {pages: pages, tags: tags, current_tag: tag, title: "##{tag}", configuration: configuration, site: site})
-    # end
+    site.tags.each do |tag|
+      render("tag.html", layout: "layout.html", path: "tags/#{tag}/index.html", locals: locals(page: TagPage.new(tag), current_tag: tag))
+    end
 
     # render("index.html", layout: "layout.html", path: "index.html", locals: {pages: pages, tags: tags, configuration: configuration, site: site})
 
@@ -32,6 +30,14 @@ class SiteBuilder
   end
 
   private
+
+  def locals(values = {})
+    values.merge(site: site, configuration: configuration)
+  end
+
+  def site
+    @site ||= Site.new(configuration)
+  end
 
   def render(template_name, path:, locals:, layout: nil)
     puts "rendering #{path}"

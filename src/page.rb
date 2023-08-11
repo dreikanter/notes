@@ -2,9 +2,10 @@ require "date"
 require "redcarpet"
 require "rouge"
 require "rouge/plugins/redcarpet"
+require_relative "./basic_page"
 require_relative "./markdown_renderer"
 
-class Page
+class Page < BasicPage
   attr_reader :source_file, :configuration
 
   def initialize(source_file:, configuration:)
@@ -56,12 +57,16 @@ class Page
     @title ||= (metadata["title"] || uid).gsub("`", "")
   end
 
+  def hide_from_toc?
+    metadata["hide_from_toc"]
+  end
+
   private
 
   def parse_published_at
     return if uid.empty?
     year, month, day = uid.match(/^(\d+)(\d\d)(\d\d)_/).captures
-    Date.new(Integer(year), Integer(month.gsub(/^0+/, "")), Integer(day.gsub(/^0+/, "")))
+    Date.new(Integer(year), Integer(month.gsub(/^0+/, "")), Integer(day.gsub(/^0+/, ""))).to_time
   rescue StandardError => e
     raise "error parsing page timestamp: '#{source_file}'; error: #{e}"
   end
