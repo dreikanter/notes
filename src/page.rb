@@ -1,7 +1,4 @@
 require "date"
-require "redcarpet"
-require "rouge"
-require "rouge/plugins/redcarpet"
 require_relative "./basic_page"
 require_relative "./markdown_renderer"
 
