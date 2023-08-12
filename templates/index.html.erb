@@ -6,7 +6,7 @@
   </div>
   <p>Notes:</p>
   <ul>
-    <% site.pages.each do |page| %>
+    <% site.toc_pages.each do |page| %>
       <li>
         <a href="<%= page.public_path %>"><%= page.title %></a>
         <% if page.published_at %>
