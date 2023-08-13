@@ -1,7 +1,0 @@
----
-notes_path: "/home/user/notes"
-build_path: "./dist"
-templates_path: "./templates"
-site_root_url: "https://notes.musayev.com/"
-site_name: "Alex Musayev Notes"
-author_name: "Alex Musayev"
