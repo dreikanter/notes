@@ -1,37 +1,72 @@
-require_relative "./page"
+require_relative "./page_types"
+require_relative "./page_builder"
 
 class Site
-  attr_reader :configuration
-
-  def initialize(configuration)
-    @configuration = configuration
-  end
-
   def pages
-    @pages ||= note_files
-      .map { Page.new(source_file: _1, configuration: configuration) }
-      .filter(&:public?).sort_by(&:published_at).reverse
+    [root_page, feed_page] + note_pages + redirect_pages + tag_pages
   end
 
-  def toc_pages
-    pages.reject(&:hide_from_toc?)
+  def note_pages
+    @note_pages ||= note_files.map { PageBuilder.new(_1).build }.compact.sort_by(&:published_at).reverse
   end
 
   def tags
-    @tags ||= pages.map(&:tags).flatten.uniq
+    @tags ||= note_pages.map(&:tags).flatten.uniq
   end
 
   def related_to(page)
-    pages.filter { _1.uid != page.uid && _1.tags.intersect?(page.tags) }
+    note_pages.filter { _1.uid != page.uid && _1.tags.intersect?(page.tags) }
   end
 
   def tagged_pages(tag)
-    toc_pages.filter { _1.tags.include?(tag) }
+    note_pages.filter { _1.tags.include?(tag) }
   end
 
   private
 
+  def redirect_pages
+    note_pages.map do |page|
+      RedirectPage.new(
+        template: "redirect.html",
+        layout: nil,
+        local_path: "#{page.uid}/index.html",
+        public_path: page.uid,
+        redirect_to: page.url
+      )
+    end
+  end
+
+  def tag_pages
+    tags.map do |tag|
+      TagPage.new(
+        template: "tag.html",
+        layout: "layout.html",
+        local_path: "tags/#{tag}/index.html",
+        public_path: "tags/#{tag}",
+        tag: tag
+      )
+    end
+  end
+
+  def root_page
+    Page.new(
+      template: "index.html",
+      layout: "layout.html",
+      local_path: File.join(Configuration.site_root_path, "index.html"),
+      public_path: Configuration.site_root_path
+    )
+  end
+
+  def feed_page
+    Page.new(
+      template: "feed.xml",
+      layout: nil,
+      local_path: File.join(Configuration.site_root_path, Configuration.feed_path),
+      public_path: Configuration.feed_path
+    )
+  end
+
   def note_files
-    Dir.glob("#{configuration.notes_path}/**/*.md")
+    Dir.glob("#{Configuration.notes_path}/**/*.md")
   end
 end

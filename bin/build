@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-require_relative "../src/configuration"
 require_relative "../src/site_builder"
 
-configuration = Configuration.new(File.expand_path("../../configuration.yml", __FILE__))
-SiteBuilder.new(configuration).build
+SiteBuilder.new.build

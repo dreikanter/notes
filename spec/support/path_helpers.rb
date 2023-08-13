@@ -6,14 +6,8 @@ module PathHelpers
   end
 
   def file_fixture_path
-    root_path.join("spec/fixtures/files")
+    Pathname.new(File.expand_path(".")).join("spec/fixtures/files")
   end
 
-  def root_path
-    Pathname.new(File.expand_path("."))
-  end
-end
-
-RSpec.configure do |config|
-  config.include PathHelpers
+  RSpec.configure { |config| config.include self }
 end
