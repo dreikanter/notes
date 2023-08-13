@@ -1,16 +1,22 @@
 Page = Data.define(
-  :public?,
+  :template,
+  :layout,
+  :local_path,
+  :public_path
+)
+
+NotePage = Data.define(
+  *Page.members,
   :uid,
   :short_uid,
   :slug,
   :tags,
   :published_at,
-  :body,
   :title,
-  :hide_from_toc?,
-  :url,
-  :local_path,
-  :public_path,
-  :template,
-  :layout
+  :body,
+  :url
 )
+
+TagPage = Data.define(*Page.members, :tag)
+
+RedirectPage = Data.define(*Page.members, :redirect_to)

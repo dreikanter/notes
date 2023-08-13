@@ -1,7 +1,23 @@
+require_relative "../src/configuration"
 require_relative "../src/markdown_renderer"
 
 RSpec.describe MarkdownRenderer do
-  subject(:renderer) { described_class.new }
+  subject(:renderer) { described_class.new(with_toc_data: true) }
 
-  it { expect(renderer.image("URL", "ALT", "TITLE")).to eq("<img src=\"URL\" alt=\"TITLE\" title=\"ALT\">") }
+  let(:markdown_source) do
+    <<~MARKDOWN
+      # Hello world
+      ![title](https://example.com/image.jpg "alt text")
+    MARKDOWN
+  end
+
+  let(:expected_html) do
+    <<~HTML
+      <h1 id="hello-world">Hello world</h1>
+
+      <p><img src="https://example.com/image.jpg" alt="title" title="alt text"></p>
+    HTML
+  end
+
+  it { expect(Redcarpet::Markdown.new(renderer).render(markdown_source)).to eq(expected_html) }
 end

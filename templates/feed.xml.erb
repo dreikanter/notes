@@ -5,7 +5,7 @@
     <link><%= configuration.site_root_url %></link>
     <atom:link href="<%= configuration.feed_url %>" rel="self" type="application/rss+xml" />
     <description></description>
-    <% site.toc_pages.each do |page| %>
+    <% site.note_pages.each do |page| %>
     <item>
       <title><%= page.title %></title>
       <link><%= page.url %></link>

@@ -1,12 +1,12 @@
 <main>
   <div class="flex flex-row flex-wrap items-stretch !my-8">
     <% site.tags.each do |tag| %>
-      <a href="/tags/<%= tag %>" class="block border rounded-md py-0 px-2 my-1 mr-2 no-underline font-normal <%= tag == current_tag ? "bg-slate-500 !text-slate-100 border-slate-600" : "bg-slate-100 !text-slate-800 border-slate-200" %>"><%= tag %></a>
+      <a href="/tags/<%= tag %>" class="block border rounded-md py-0 px-2 my-1 mr-2 no-underline font-normal <%= tag == page.tag ? "bg-slate-500 !text-slate-100 border-slate-600" : "bg-slate-100 !text-slate-800 border-slate-200" %>"><%= tag %></a>
     <% end %>
   </div>
-  <p>Tagged with <a href="/tags/<%= current_tag %>"><%= current_tag %></a>:</p>
+  <p>Tagged with <a href="/tags/<%= page.tag %>"><%= page.tag %></a>:</p>
   <ul>
-    <% site.tagged_pages(current_tag).each do |page| %>
+    <% site.tagged_pages(page.tag).each do |page| %>
       <li>
         <a href="<%= page.public_path %>"><%= page.title %></a>
         <% if page.published_at %>

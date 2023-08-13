@@ -5,7 +5,6 @@ RSpec.describe Page do
 
   let(:expected_members) do
     [
-      :public?,
       :uid,
       :short_uid,
       :slug,
@@ -13,7 +12,6 @@ RSpec.describe Page do
       :published_at,
       :body,
       :title,
-      :hide_from_toc?,
       :url,
       :local_path,
       :public_path,
