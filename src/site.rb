@@ -1,4 +1,4 @@
-require_relative "./page"
+require_relative "./page_types"
 require_relative "./page_builder"
 
 class Site
@@ -30,7 +30,7 @@ class Site
         template: "redirect.html",
         layout: nil,
         local_path: "#{page.uid}/index.html",
-        public_path: "#{page.uid}",
+        public_path: page.uid,
         redirect_to: page.url
       )
     end

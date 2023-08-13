@@ -1,5 +1,5 @@
 require "date"
-require_relative "./page"
+require_relative "./page_types"
 require_relative "./configuration"
 require_relative "./markdown_parser"
 
