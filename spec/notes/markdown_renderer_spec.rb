@@ -1,11 +1,11 @@
 RSpec.describe Notes::MarkdownRenderer do
   subject(:renderer) { described_class.new(with_toc_data: true) }
 
-  include_context "cleanshot"
+  include_context "with cleanshot helpers"
 
   let(:result) { Redcarpet::Markdown.new(renderer).render(markdown_source) }
 
-  context "cleanshot image rendering" do
+  context "with cleanshot image reference" do
     let(:markdown_source) { "![title](#{cleanshot_url} \"alt text\")" }
     let(:expected_html) { %r{^<p><img src="[\d\w]+.jpg" alt="title" title="alt text"></p>\n$} }
 

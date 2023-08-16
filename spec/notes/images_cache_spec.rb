@@ -1,7 +1,7 @@
 RSpec.describe Notes::ImagesCache do
   subject(:images_cache) { described_class.new }
 
-  include_context "cleanshot"
+  include_context "with cleanshot helpers"
 
   before do
     stub_cleanshot_url.to_return(status: 302, headers: {"Location" => cleanshot_direct_image_url})
@@ -12,8 +12,8 @@ RSpec.describe Notes::ImagesCache do
     Dir.mktmpdir do |images_path|
       allow(Notes::Configuration).to receive(:images_path).and_return(images_path)
       result = images_cache.get(cleanshot_url)
-      expect(File.exist?(File.join(images_path, result))).to be_truthy
-      expect(File.exist?(File.join(images_path, "index.json"))).to be_truthy
+      expect(File.exist(File.join(images_path, result))).to be_truthy
+      expect(File.exist(File.join(images_path, "index.json"))).to be_truthy
       expect(File.extname(result)).to eq(".jpg")
     end
   end

@@ -1,4 +1,4 @@
-RSpec.shared_context "cleanshot" do
+RSpec.shared_context "with cleanshot helpers" do
   let(:cleanshot_url) { "https://share.cleanshot.com/80085" }
 
   let(:cleanshot_direct_image_url) do
