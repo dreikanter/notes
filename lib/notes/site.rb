@@ -4,7 +4,7 @@ class Notes::Site
   end
 
   def note_pages
-    @note_pages ||= note_files.map { Notes::PageBuilder.new(_1).build }.compact.sort_by(&:published_at).reverse
+    @note_pages ||= note_files.map { Notes::NotePageBuilder.new(_1).build }.compact.sort_by(&:published_at).reverse
   end
 
   def tags

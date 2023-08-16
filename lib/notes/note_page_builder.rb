@@ -1,4 +1,4 @@
-class Notes::PageBuilder
+class Notes::NotePageBuilder
   attr_reader :source_file
 
   def initialize(source_file)
