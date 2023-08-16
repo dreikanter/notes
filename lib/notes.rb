@@ -31,9 +31,10 @@ module Notes
 
   RedirectPage = ::Data.define(*Page.members, :redirect_to)
 
-  require_relative "./notes/configuration"
   require_relative "./notes/cleanshot_downloader"
-  require_relative "./notes/markdown_parser"
+  require_relative "./notes/configuration"
+  require_relative "./notes/image"
+  require_relative "./notes/images_cache"
   require_relative "./notes/markdown_renderer"
   require_relative "./notes/note_page_builder"
   require_relative "./notes/site"

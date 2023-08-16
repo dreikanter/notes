@@ -37,7 +37,14 @@ class Notes::NotePageBuilder
   end
 
   def body
-    Notes::MarkdownParser.render(source_content.gsub(FRONTMATTER_PATETRN, ""))
+    Redcarpet::Markdown.new(
+      Notes::MarkdownRenderer.new(with_toc_data: true),
+      fenced_code_blocks: true,
+      autolink: true,
+      strikethrough: true,
+      space_after_headers: true,
+      highlight: true
+    ).render(source_content.gsub(FRONTMATTER_PATETRN, ""))
   end
 
   def local_path
