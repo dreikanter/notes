@@ -36,6 +36,10 @@ class Notes::Configuration
       File.join(site_root_path, "feed.xml")
     end
 
+    def images_path
+      expand_path("images_path")
+    end
+
     private
 
     def expand_path(key)

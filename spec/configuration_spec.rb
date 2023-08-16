@@ -14,4 +14,5 @@ RSpec.describe Notes::Configuration do
   it { expect(configuration.site_root_path).to eq("/") }
   it { expect(configuration.feed_url).to eq("https://notes.musayev.com/feed.xml") }
   it { expect(configuration.feed_path).to eq("/feed.xml") }
+  it { expect(configuration.images_path).to eq(File.join(file_fixture_path, "configuration/images")) }
 end
