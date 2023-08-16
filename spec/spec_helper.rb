@@ -14,8 +14,9 @@
 #
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require "pry"
-require "./spec/support/env_helpers"
-require "./spec/support/path_helpers"
+require_relative "../lib/notes"
+require_relative "./support/env_helpers"
+require_relative "./support/path_helpers"
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

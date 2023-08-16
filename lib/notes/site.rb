@@ -1,13 +1,10 @@
-require_relative "./page_types"
-require_relative "./page_builder"
-
-class Site
+class Notes::Site
   def pages
     [root_page, feed_page] + note_pages + redirect_pages + tag_pages
   end
 
   def note_pages
-    @note_pages ||= note_files.map { PageBuilder.new(_1).build }.compact.sort_by(&:published_at).reverse
+    @note_pages ||= note_files.map { Notes::NotePageBuilder.new(_1).build }.compact.sort_by(&:published_at).reverse
   end
 
   def tags
@@ -26,7 +23,7 @@ class Site
 
   def redirect_pages
     note_pages.map do |page|
-      RedirectPage.new(
+      Notes::RedirectPage.new(
         template: "redirect.html",
         layout: nil,
         local_path: "#{page.uid}/index.html",
@@ -38,7 +35,7 @@ class Site
 
   def tag_pages
     tags.map do |tag|
-      TagPage.new(
+      Notes::TagPage.new(
         template: "tag.html",
         layout: "layout.html",
         local_path: "tags/#{tag}/index.html",
@@ -49,24 +46,24 @@ class Site
   end
 
   def root_page
-    Page.new(
+    Notes::Page.new(
       template: "index.html",
       layout: "layout.html",
-      local_path: File.join(Configuration.site_root_path, "index.html"),
-      public_path: Configuration.site_root_path
+      local_path: File.join(Notes::Configuration.site_root_path, "index.html"),
+      public_path: Notes::Configuration.site_root_path
     )
   end
 
   def feed_page
-    Page.new(
+    Notes::Page.new(
       template: "feed.xml",
       layout: nil,
-      local_path: File.join(Configuration.site_root_path, Configuration.feed_path),
-      public_path: Configuration.feed_path
+      local_path: File.join(Notes::Configuration.site_root_path, Notes::Configuration.feed_path),
+      public_path: Notes::Configuration.feed_path
     )
   end
 
   def note_files
-    Dir.glob("#{Configuration.notes_path}/**/*.md")
+    Dir.glob("#{Notes::Configuration.notes_path}/**/*.md")
   end
 end

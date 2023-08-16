@@ -1,9 +1,4 @@
-require "date"
-require_relative "./page_types"
-require_relative "./configuration"
-require_relative "./markdown_parser"
-
-class PageBuilder
+class Notes::NotePageBuilder
   attr_reader :source_file
 
   def initialize(source_file)
@@ -12,7 +7,7 @@ class PageBuilder
 
   def build
     return unless public?
-    NotePage.new(**NotePage.members.to_h { [_1, send(_1)] })
+    Notes::NotePage.new(**Notes::NotePage.members.to_h { [_1, send(_1)] })
   end
 
   private
@@ -42,7 +37,7 @@ class PageBuilder
   end
 
   def body
-    MarkdownParser.render(source_content.gsub(FRONTMATTER_PATETRN, ""))
+    Notes::MarkdownParser.render(source_content.gsub(FRONTMATTER_PATETRN, ""))
   end
 
   def local_path
@@ -50,11 +45,11 @@ class PageBuilder
   end
 
   def public_path
-    @public_path ||= File.join(Configuration.site_root_path, local_path.gsub(/\/index.html$/, ""))
+    @public_path ||= File.join(Notes::Configuration.site_root_path, local_path.gsub(/\/index.html$/, ""))
   end
 
   def url
-    File.join(Configuration.site_root_url, public_path)
+    File.join(Notes::Configuration.site_root_url, public_path)
   end
 
   def title

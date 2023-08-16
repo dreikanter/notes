@@ -1,6 +1,4 @@
-require_relative "./markdown_renderer"
-
-class MarkdownParser
+class Notes::MarkdownParser
   class << self
     def render(source_content)
       instance.render(source_content)
@@ -10,7 +8,7 @@ class MarkdownParser
 
     def instance
       @markdown ||= Redcarpet::Markdown.new(
-        MarkdownRenderer.new(with_toc_data: true),
+        Notes::MarkdownRenderer.new(with_toc_data: true),
         fenced_code_blocks: true,
         autolink: true,
         strikethrough: true,

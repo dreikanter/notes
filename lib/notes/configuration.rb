@@ -1,7 +1,4 @@
-require "uri"
-require "yaml"
-
-class Configuration
+class Notes::Configuration
   class << self
     def notes_path
       expand_path("notes_path")
@@ -42,7 +39,7 @@ class Configuration
     private
 
     def expand_path(key)
-      File.expand_path(fetch(key), root_path)
+      File.expand_path(fetch(key), File.dirname(file_name))
     end
 
     def fetch(key)
@@ -50,15 +47,18 @@ class Configuration
     end
 
     def data
-      @data ||= YAML.safe_load(File.read(file_name))
+      @data ||= begin
+        abort "configuration file not found at #{file_name}" unless File.exist?(file_name)
+        YAML.safe_load(File.read(file_name))
+      end
     end
 
     def file_name
-      File.join(root_path, "configuration.yml")
+      @file_name ||= explicit_configuration_path || File.join(Dir.pwd, "configuration.yml")
     end
 
-    def root_path
-      @root_path ||= ENV.fetch("NOTES_CONFIGURATION_PATH") { Dir.pwd }
+    def explicit_configuration_path
+      ENV["NOTES_CONFIGURATION_PATH"]&.then { File.expand_path(_1) }
     end
   end
 end

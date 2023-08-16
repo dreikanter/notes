@@ -1,14 +1,12 @@
-require_relative "../src/configuration"
-
-RSpec.describe Configuration do
+RSpec.describe Notes::Configuration do
   subject(:configuration) { described_class }
 
-  let(:root_path) { file_fixture("configuration") }
+  let(:root_path) { file_fixture("configuration/configuration.yml") }
 
   before { stub_env("NOTES_CONFIGURATION_PATH", root_path) }
 
   it { expect(configuration.notes_path).to eq("/home/user/notes") }
-  it { expect(configuration.build_path).to eq(File.join(root_path, "dist")) }
+  it { expect(configuration.build_path).to eq(File.join(file_fixture_path, "configuration/dist")) }
   it { expect(configuration.templates_path).to eq(File.join(file_fixture_path, "configuration/templates")) }
   it { expect(configuration.site_root_url).to eq("https://notes.musayev.com") }
   it { expect(configuration.site_name).to eq("Alex Musayev Notes") }
