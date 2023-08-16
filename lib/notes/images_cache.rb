@@ -42,7 +42,7 @@ class Notes::ImagesCache
   end
 
   def normalized_extension(extension)
-    extension.downcase.then { _1 == ".jpeg" ? ".jpg" : _1 }
+    extension.downcase.then { (_1 == ".jpeg") ? ".jpg" : _1 }
   end
 
   def images_path

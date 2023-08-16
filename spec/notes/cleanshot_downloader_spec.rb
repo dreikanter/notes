@@ -1,7 +1,7 @@
 RSpec.describe Notes::CleanshotDownloader do
-  include_context "cleanshot"
-
   subject(:service_call) { described_class.new(cleanshot_url).download }
+
+  include_context "cleanshot"
 
   context "with successful responses" do
     before do

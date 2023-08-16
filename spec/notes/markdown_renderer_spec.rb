@@ -1,7 +1,7 @@
 RSpec.describe Notes::MarkdownRenderer do
-  include_context "cleanshot"
-
   subject(:renderer) { described_class.new(with_toc_data: true) }
+
+  include_context "cleanshot"
 
   let(:result) { Redcarpet::Markdown.new(renderer).render(markdown_source) }
 

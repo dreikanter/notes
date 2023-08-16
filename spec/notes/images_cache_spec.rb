@@ -1,7 +1,7 @@
 RSpec.describe Notes::ImagesCache do
-  include_context "cleanshot"
-
   subject(:images_cache) { described_class.new }
+
+  include_context "cleanshot"
 
   before do
     stub_cleanshot_url.to_return(status: 302, headers: {"Location" => cleanshot_direct_image_url})
