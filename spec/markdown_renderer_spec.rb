@@ -1,7 +1,4 @@
-require_relative "../src/configuration"
-require_relative "../src/markdown_renderer"
-
-RSpec.describe MarkdownRenderer do
+RSpec.describe Notes::MarkdownRenderer do
   subject(:renderer) { described_class.new(with_toc_data: true) }
 
   let(:markdown_source) do
