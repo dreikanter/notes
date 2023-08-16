@@ -19,6 +19,7 @@ require "webmock/rspec"
 require_relative "../lib/notes"
 require_relative "./support/env_helpers"
 require_relative "./support/path_helpers"
+require_relative "./support/cleanshot_context"
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
