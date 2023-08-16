@@ -14,6 +14,8 @@
 #
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require "pry"
+require "webmock/rspec"
+
 require_relative "../lib/notes"
 require_relative "./support/env_helpers"
 require_relative "./support/path_helpers"

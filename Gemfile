@@ -11,5 +11,6 @@ group :development do
   gem "rubocop-rspec", require: false
   gem "standard", ">= 1.0", require: false
   gem "standard-performance", require: false
+  gem "webmock", "~> 3.18"
   gem "yaml-lint", "~> 0.1.2", require: false
 end
