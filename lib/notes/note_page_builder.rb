@@ -69,7 +69,7 @@ class Notes::NotePageBuilder
 
   def process_image
     lambda do |url|
-      Notes::ImagesCache.new.get(url: url, scope: uid) { attachments << _1 }
+      Notes::ImagesCache.new.get(url: url, scope: uid).tap { attachments << _1 }
     end
   end
 

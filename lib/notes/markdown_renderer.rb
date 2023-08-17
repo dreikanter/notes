@@ -9,6 +9,7 @@ class Notes::MarkdownRenderer < Redcarpet::Render::HTML
   end
 
   def image(link, title, alt_text)
-    "<img src=\"#{process_image.call(link)}\" alt=\"#{alt_text}\" title=\"#{title}\">"
+    cached_image_path = process_image.call(link)
+    "<img src=\"#{File.basename(cached_image_path)}\" alt=\"#{alt_text}\" title=\"#{title}\">"
   end
 end
