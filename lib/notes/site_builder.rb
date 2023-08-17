@@ -13,7 +13,7 @@ class Notes::SiteBuilder
     local_path = page.local_path
     puts "rendering #{local_path}"
     locals = {configuration: Notes::Configuration, site: site, page: page}
-    content = render_page(page: page, template: page.template, layout: page.layout, locals: locals)
+    content = render_page(template: page.template, layout: page.layout, locals: locals)
     write(local_path: local_path, content: content)
   end
 
@@ -23,7 +23,7 @@ class Notes::SiteBuilder
     File.write(path, content)
   end
 
-  def render_page(page:, template:, layout:, locals:)
+  def render_page(template:, layout:, locals:)
     content = render_template(template: template, locals: locals)
     layout ? render_template(template: layout, locals: locals) { content } : content
   end

@@ -7,7 +7,19 @@ class Notes::NotePageBuilder
 
   def build
     return unless public?
-    Notes::NotePage.new(**Notes::NotePage.members.to_h { [_1, send(_1)] })
+
+    Notes::NotePage.new(
+      uid: uid,
+      short_uid: short_uid,
+      slug: slug,
+      tags: tags,
+      published_at: published_at,
+      title: title,
+      body: body,
+      url: url,
+      local_path: local_path,
+      public_path: public_path
+    )
   end
 
   private
@@ -80,14 +92,6 @@ class Notes::NotePageBuilder
     Date.new(Integer(year), Integer(month.gsub(/^0+/, "")), Integer(day.gsub(/^0+/, ""))).to_time
   rescue StandardError => e
     raise "error parsing page timestamp: '#{source_file}'; error: #{e}"
-  end
-
-  def template
-    "note.html"
-  end
-
-  def layout
-    "layout.html"
   end
 
   def metadata

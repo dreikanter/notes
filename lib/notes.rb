@@ -1,5 +1,7 @@
 require "date"
 require "fileutils"
+require "http"
+require "pry"
 require "redcarpet"
 require "rouge"
 require "rouge/plugins/redcarpet"
@@ -9,34 +11,15 @@ require "uri"
 require "yaml"
 
 module Notes
-  Page = ::Data.define(
-    :template,
-    :layout,
-    :local_path,
-    :public_path
-  )
-
-  NotePage = ::Data.define(
-    *Page.members,
-    :uid,
-    :short_uid,
-    :slug,
-    :tags,
-    :published_at,
-    :title,
-    :body,
-    :url
-  )
-
-  TagPage = ::Data.define(*Page.members, :tag)
-
-  RedirectPage = ::Data.define(*Page.members, :redirect_to)
-
   require_relative "./notes/cleanshot_downloader"
   require_relative "./notes/configuration"
   require_relative "./notes/images_cache"
   require_relative "./notes/markdown_renderer"
+  require_relative "./notes/note_page"
   require_relative "./notes/note_page_builder"
+  require_relative "./notes/page"
+  require_relative "./notes/redirect_page"
   require_relative "./notes/site"
   require_relative "./notes/site_builder"
+  require_relative "./notes/tag_page"
 end
