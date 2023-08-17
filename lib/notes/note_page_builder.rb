@@ -69,9 +69,7 @@ class Notes::NotePageBuilder
 
   def process_image
     lambda do |url|
-      image_path = Notes::ImagesCache.new.get(url: url, scope: uid)
-      attachments << image_path
-      File.join(public_images_path, image_path)
+      Notes::ImagesCache.new.get(url: url, scope: uid) { attachments << _1 }
     end
   end
 
@@ -125,9 +123,5 @@ class Notes::NotePageBuilder
 
   def site_root_url
     Notes::Configuration.site_root_url
-  end
-
-  def public_images_path
-    Notes::Configuration.public_images_path
   end
 end
