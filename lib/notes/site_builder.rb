@@ -29,7 +29,7 @@ class Notes::SiteBuilder
   def copy_attachments(local_path:, attachments:)
     attachments.each do |attachment|
       logger.info("attaching #{attachment}")
-      cached_file = File.join(local_images_path, attachment)
+      cached_file = File.join(assets_path, attachment)
       dest_path = File.join(build_path, File.dirname(local_path), File.basename(attachment))
       next if File.exist?(dest_path) && FileUtils.compare_file(cached_file, dest_path)
       FileUtils.cp_r(cached_file, dest_path, remove_destination: true)
@@ -62,7 +62,7 @@ class Notes::SiteBuilder
     Notes::Configuration.templates_path
   end
 
-  def local_images_path
-    Notes::Configuration.local_images_path
+  def assets_path
+    Notes::Configuration.assets_path
   end
 end

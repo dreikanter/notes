@@ -17,7 +17,7 @@ class Notes::ImagesCache
 
   def save_image_file(scope:, url:, original_file_name:, content:)
     normalized_file_name_for(file_name: original_file_name, scope: scope).tap do |file_name|
-      write(path: File.join(local_images_path, file_name), mode: "wb", content: content)
+      write(path: File.join(assets_path, file_name), mode: "wb", content: content)
       write(path: images_index_path, mode: "wt", content: JSON.pretty_generate(cached_images.merge(url => file_name)))
     end
   end
@@ -39,7 +39,7 @@ class Notes::ImagesCache
     Notes::Configuration.images_index_path
   end
 
-  def local_images_path
-    Notes::Configuration.local_images_path
+  def assets_path
+    Notes::Configuration.assets_path
   end
 end
