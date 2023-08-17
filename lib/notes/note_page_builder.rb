@@ -18,7 +18,8 @@ class Notes::NotePageBuilder
       body: body,
       url: url,
       local_path: local_path,
-      public_path: public_path
+      public_path: public_path,
+      attachments: attachments
     )
   end
 
@@ -67,7 +68,15 @@ class Notes::NotePageBuilder
   end
 
   def process_image
-    ->(url) { Notes::ImagesCache.new.get(url: url, scope: uid) }
+    lambda do |url|
+      image_path = Notes::ImagesCache.new.get(url: url, scope: uid)
+      attachments << image_path
+      File.join(public_images_path, image_path)
+    end
+  end
+
+  def attachments
+    @attachments ||= []
   end
 
   def local_path
@@ -75,11 +84,11 @@ class Notes::NotePageBuilder
   end
 
   def public_path
-    @public_path ||= File.join(Notes::Configuration.site_root_path, local_path.gsub(/\/index.html$/, ""))
+    @public_path ||= File.join(site_root_path, local_path.gsub(/\/index.html$/, ""))
   end
 
   def url
-    File.join(Notes::Configuration.site_root_url, public_path)
+    File.join(site_root_url, public_path)
   end
 
   def title
@@ -109,4 +118,16 @@ class Notes::NotePageBuilder
   FRONTMATTER_PATETRN = /\A(---\s*\n.*?\n?)^((---|\.\.\.)\s*$\n?)/m
 
   private_constant :FRONTMATTER_PATETRN
+
+  def site_root_path
+    Notes::Configuration.site_root_path
+  end
+
+  def site_root_url
+    Notes::Configuration.site_root_url
+  end
+
+  def public_images_path
+    Notes::Configuration.public_images_path
+  end
 end

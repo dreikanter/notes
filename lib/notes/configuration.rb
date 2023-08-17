@@ -44,6 +44,10 @@ class Notes::Configuration
       File.join(local_images_path, "index.json")
     end
 
+    def public_images_path
+      fetch("public_images_path")
+    end
+
     private
 
     def expand_path(key)

@@ -6,26 +6,18 @@ RSpec.describe Notes::MarkdownRenderer do
     )
   end
 
-  include_context "with cleanshot helpers"
-
   let(:result) { Redcarpet::Markdown.new(renderer).render(markdown_source) }
-  let(:process_image) { Proc.new {} }
+  let(:process_image) do
+    lambda do |url|
+      raise unless url == "https://example.com/image.jpg"
+      "PROCESSED_IMAGE_URL"
+    end
+  end
 
   context "with cleanshot image reference" do
-    let(:markdown_source) { "![title](#{cleanshot_url} \"alt text\")" }
-    let(:expected_html) { "<p><img src=\"CACHED_IMAGE_PATH\" alt=\"title\" title=\"alt text\"></p>\n" }
+    let(:markdown_source) { "![title](https://example.com/image.jpg \"alt text\")" }
+    let(:expected_html) { "<p><img src=\"PROCESSED_IMAGE_URL\" alt=\"title\" title=\"alt text\"></p>\n" }
 
-    before do
-      stub_cleanshot_url.to_return(status: 302, headers: {"Location" => cleanshot_direct_image_url})
-      stub_cleanshot_direct_image_url.to_return(headers: {"Content-Type" => "image/jpeg"}, body: image_content)
-    end
-
-    it "render image tag" do
-      Dir.mktmpdir do |local_images_path|
-        allow(Notes::Configuration).to receive(:local_images_path).and_return(local_images_path)
-        expect(process_image).to receive(:call).once.and_return("CACHED_IMAGE_PATH")
-        expect(result).to match(expected_html)
-      end
-    end
+    it { expect(result).to match(expected_html) }
   end
 end
