@@ -14,9 +14,14 @@
 #
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require "pry"
+require "webmock/rspec"
+
+ENV["SUPPRESS_LOGS"] = "true"
+
 require_relative "../lib/notes"
 require_relative "./support/env_helpers"
 require_relative "./support/path_helpers"
+require_relative "./support/cleanshot_context"
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

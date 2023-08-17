@@ -24,8 +24,6 @@ class Notes::Site
   def redirect_pages
     note_pages.map do |page|
       Notes::RedirectPage.new(
-        template: "redirect.html",
-        layout: nil,
         local_path: "#{page.uid}/index.html",
         public_path: page.uid,
         redirect_to: page.url
@@ -36,8 +34,6 @@ class Notes::Site
   def tag_pages
     tags.map do |tag|
       Notes::TagPage.new(
-        template: "tag.html",
-        layout: "layout.html",
         local_path: "tags/#{tag}/index.html",
         public_path: "tags/#{tag}",
         tag: tag

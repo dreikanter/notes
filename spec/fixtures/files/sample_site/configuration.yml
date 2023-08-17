@@ -1,0 +1,8 @@
+---
+notes_path: "/home/user/notes"
+build_path: "./dist"
+templates_path: "./templates"
+assets_path: "./images"
+site_name: "Site Name"
+site_root_url: "https://example.com/"
+author_name: "Author Name"

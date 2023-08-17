@@ -7,7 +7,20 @@ class Notes::NotePageBuilder
 
   def build
     return unless public?
-    Notes::NotePage.new(**Notes::NotePage.members.to_h { [_1, send(_1)] })
+
+    Notes::NotePage.new(
+      uid: uid,
+      short_uid: short_uid,
+      slug: slug,
+      tags: tags,
+      published_at: published_at,
+      title: title,
+      body: body,
+      url: url,
+      local_path: local_path,
+      public_path: public_path,
+      attachments: attachments
+    )
   end
 
   private
@@ -37,7 +50,31 @@ class Notes::NotePageBuilder
   end
 
   def body
-    Notes::MarkdownParser.render(source_content.gsub(FRONTMATTER_PATETRN, ""))
+    Redcarpet::Markdown.new(
+      markdown_renderer,
+      fenced_code_blocks: true,
+      autolink: true,
+      strikethrough: true,
+      space_after_headers: true,
+      highlight: true
+    ).render(source_content.gsub(FRONTMATTER_PATETRN, ""))
+  end
+
+  def markdown_renderer
+    Notes::MarkdownRenderer.new(
+      extensions: {with_toc_data: true},
+      process_image: process_image
+    )
+  end
+
+  def process_image
+    lambda do |url|
+      Notes::ImagesCache.new.get(url: url, scope: uid) { attachments << _1 }
+    end
+  end
+
+  def attachments
+    @attachments ||= []
   end
 
   def local_path
@@ -45,11 +82,11 @@ class Notes::NotePageBuilder
   end
 
   def public_path
-    @public_path ||= File.join(Notes::Configuration.site_root_path, local_path.gsub(/\/index.html$/, ""))
+    @public_path ||= File.join(site_root_path, local_path.gsub(/\/index.html$/, ""))
   end
 
   def url
-    File.join(Notes::Configuration.site_root_url, public_path)
+    File.join(site_root_url, public_path)
   end
 
   def title
@@ -62,14 +99,6 @@ class Notes::NotePageBuilder
     Date.new(Integer(year), Integer(month.gsub(/^0+/, "")), Integer(day.gsub(/^0+/, ""))).to_time
   rescue StandardError => e
     raise "error parsing page timestamp: '#{source_file}'; error: #{e}"
-  end
-
-  def template
-    "note.html"
-  end
-
-  def layout
-    "layout.html"
   end
 
   def metadata
@@ -87,4 +116,12 @@ class Notes::NotePageBuilder
   FRONTMATTER_PATETRN = /\A(---\s*\n.*?\n?)^((---|\.\.\.)\s*$\n?)/m
 
   private_constant :FRONTMATTER_PATETRN
+
+  def site_root_path
+    Notes::Configuration.site_root_path
+  end
+
+  def site_root_url
+    Notes::Configuration.site_root_url
+  end
 end

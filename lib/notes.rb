@@ -1,40 +1,29 @@
 require "date"
 require "fileutils"
+require "http"
+require "logger"
+require "pry"
 require "redcarpet"
 require "rouge"
 require "rouge/plugins/redcarpet"
+require "securerandom"
 require "tilt"
 require "uri"
 require "yaml"
 
+$:.unshift(File.expand_path(__dir__))
+
 module Notes
-  Page = ::Data.define(
-    :template,
-    :layout,
-    :local_path,
-    :public_path
-  )
-
-  NotePage = ::Data.define(
-    *Page.members,
-    :uid,
-    :short_uid,
-    :slug,
-    :tags,
-    :published_at,
-    :title,
-    :body,
-    :url
-  )
-
-  TagPage = ::Data.define(*Page.members, :tag)
-
-  RedirectPage = ::Data.define(*Page.members, :redirect_to)
-
-  require_relative "./notes/configuration"
-  require_relative "./notes/markdown_parser"
-  require_relative "./notes/markdown_renderer"
-  require_relative "./notes/note_page_builder"
-  require_relative "./notes/site"
-  require_relative "./notes/site_builder"
+  autoload :CleanshotDownloader, "notes/cleanshot_downloader"
+  autoload :Configuration, "notes/configuration"
+  autoload :ImagesCache, "notes/images_cache"
+  autoload :Logging, "notes/logging"
+  autoload :MarkdownRenderer, "notes/markdown_renderer"
+  autoload :NotePage, "notes/note_page"
+  autoload :NotePageBuilder, "notes/note_page_builder"
+  autoload :Page, "notes/page"
+  autoload :RedirectPage, "notes/redirect_page"
+  autoload :Site, "notes/site"
+  autoload :SiteBuilder, "notes/site_builder"
+  autoload :TagPage, "notes/tag_page"
 end
