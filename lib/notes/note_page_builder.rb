@@ -38,13 +38,24 @@ class Notes::NotePageBuilder
 
   def body
     Redcarpet::Markdown.new(
-      Notes::MarkdownRenderer.new(with_toc_data: true),
+      markdown_renderer,
       fenced_code_blocks: true,
       autolink: true,
       strikethrough: true,
       space_after_headers: true,
       highlight: true
     ).render(source_content.gsub(FRONTMATTER_PATETRN, ""))
+  end
+
+  def markdown_renderer
+    Notes::MarkdownRenderer.new(
+      extensions: {with_toc_data: true},
+      process_image: process_image
+    )
+  end
+
+  def process_image
+    ->(image_url) { Notes::ImagesCache.new.get(image_url) }
   end
 
   def local_path

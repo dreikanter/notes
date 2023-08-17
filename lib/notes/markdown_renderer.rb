@@ -1,13 +1,14 @@
 class Notes::MarkdownRenderer < Redcarpet::Render::HTML
   include Rouge::Plugins::Redcarpet
 
-  def image(link, title, alt_text)
-    "<img src=\"#{cached_image_url(link)}\" alt=\"#{alt_text}\" title=\"#{title}\">"
+  attr_reader :process_image
+
+  def initialize(extensions: {}, process_image:)
+    super(extensions)
+    @process_image = process_image
   end
 
-  private
-
-  def cached_image_url(link)
-    Notes::ImagesCache.new.get(link)
+  def image(link, title, alt_text)
+    "<img src=\"#{process_image.call(link)}\" alt=\"#{alt_text}\" title=\"#{title}\">"
   end
 end
