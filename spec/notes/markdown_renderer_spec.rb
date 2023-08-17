@@ -21,8 +21,8 @@ RSpec.describe Notes::MarkdownRenderer do
     end
 
     it "render image tag" do
-      Dir.mktmpdir do |images_path|
-        allow(Notes::Configuration).to receive(:images_path).and_return(images_path)
+      Dir.mktmpdir do |local_images_path|
+        allow(Notes::Configuration).to receive(:local_images_path).and_return(local_images_path)
         expect(process_image).to receive(:call).once.and_return("CACHED_IMAGE_PATH")
         expect(result).to match(expected_html)
       end

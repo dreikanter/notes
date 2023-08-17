@@ -55,7 +55,7 @@ class Notes::NotePageBuilder
   end
 
   def process_image
-    ->(image_url) { Notes::ImagesCache.new.get(image_url) }
+    ->(url) { Notes::ImagesCache.new.get(url: url, scope: uid) }
   end
 
   def local_path

@@ -1,8 +1,8 @@
 class Notes::ImagesCache
-  def get(url)
+  def get(url:, scope:)
     cached_images.fetch(url) do
       image = Notes::CleanshotDownloader.new(url).download
-      save_image_file(**image).tap { add_to_index(url, _1) }
+      save_image_file(scope: scope, url:, **image)
     end
   end
 
@@ -15,19 +15,20 @@ class Notes::ImagesCache
     {}
   end
 
-  def save_image_file(original_file_name:, content:)
-    FileUtils.mkdir_p(images_path)
-    file_name = normalized_file_name_for(original_file_name)
-    File.open(File.join(images_path, file_name), "wb").write(content)
-    file_name
+  def save_image_file(scope:, url:, original_file_name:, content:)
+    normalized_file_name_for(file_name: original_file_name, scope: scope).tap do |file_name|
+      write(path: File.join(local_images_path, file_name), mode: "wb", content: content)
+      write(path: images_index_path, mode: "wt", content: JSON.pretty_generate(cached_images.merge(url => file_name)))
+    end
   end
 
-  def add_to_index(url, path)
-    File.write(images_index_path, JSON.pretty_generate(cached_images.merge(url => path)))
+  def write(path:, mode:, content:)
+    FileUtils.mkdir_p(File.dirname(path))
+    File.open(path, mode).write(content)
   end
 
-  def normalized_file_name_for(file_name)
-    "#{SecureRandom.uuid.gsub("-", "")}#{extension(file_name)}"
+  def normalized_file_name_for(file_name:, scope:)
+    File.join(scope, "#{SecureRandom.uuid.gsub("-", "")}#{extension(file_name)}")
   end
 
   def extension(file_name)
@@ -38,7 +39,7 @@ class Notes::ImagesCache
     Notes::Configuration.images_index_path
   end
 
-  def images_path
-    Notes::Configuration.images_path
+  def local_images_path
+    Notes::Configuration.local_images_path
   end
 end

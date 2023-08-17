@@ -14,7 +14,7 @@ RSpec.describe Notes::Configuration do
   it { expect(configuration.site_root_path).to eq("/") }
   it { expect(configuration.feed_url).to eq("https://example.com/feed.xml") }
   it { expect(configuration.feed_path).to eq("/feed.xml") }
-  it { expect(configuration.images_path).to eq(expand("images")) }
+  it { expect(configuration.local_images_path).to eq(expand("images")) }
   it { expect(configuration.images_index_path).to eq(expand("images/index.json")) }
 
   def expand(rel_path)

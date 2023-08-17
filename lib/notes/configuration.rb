@@ -36,12 +36,12 @@ class Notes::Configuration
       File.join(site_root_path, "feed.xml")
     end
 
-    def images_path
-      expand_path("images_path")
+    def local_images_path
+      expand_path("local_images_path")
     end
 
     def images_index_path
-      File.join(images_path, "index.json")
+      File.join(local_images_path, "index.json")
     end
 
     private
