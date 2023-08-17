@@ -3,7 +3,7 @@ class Notes::MarkdownRenderer < Redcarpet::Render::HTML
 
   attr_reader :process_image
 
-  def initialize(extensions: {}, process_image:)
+  def initialize(process_image:, extensions: {})
     super(extensions)
     @process_image = process_image
   end

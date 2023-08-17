@@ -1,4 +1,6 @@
 class Notes::CleanshotDownloader
+  include Notes::Logging
+
   attr_reader :url
 
   def initialize(url)
@@ -6,10 +8,10 @@ class Notes::CleanshotDownloader
   end
 
   def download
-    puts "downloading image #{url}"
+    logger.info("downloading image #{url}")
     response = HTTP.get(direct_image_url)
     raise "error downloading image" unless response.status.success?
-    { original_file_name: original_file_name, content: response.body.to_s }
+    {original_file_name: original_file_name, content: response.body.to_s}
   end
 
   private

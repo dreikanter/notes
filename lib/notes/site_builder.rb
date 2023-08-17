@@ -1,4 +1,6 @@
 class Notes::SiteBuilder
+  include Notes::Logging
+
   def build
     site.pages.each { render(_1) }
   end
@@ -11,7 +13,7 @@ class Notes::SiteBuilder
 
   def render(page)
     local_path = page.local_path
-    puts "rendering #{local_path}"
+    logger.info("rendering #{local_path}")
     locals = {configuration: Notes::Configuration, site: site, page: page}
     content = render_page(template: page.template, layout: page.layout, locals: locals)
     write(local_path: local_path, content: content)
@@ -26,7 +28,7 @@ class Notes::SiteBuilder
 
   def copy_attachments(local_path:, attachments:)
     attachments.each do |attachment|
-      puts "attachment: #{attachment}"
+      logger.info("attaching #{attachment}")
       cached_file = File.join(local_images_path, attachment)
       dest_path = File.join(build_path, File.dirname(local_path), File.basename(attachment))
       next if File.exist?(dest_path) && FileUtils.compare_file(cached_file, dest_path)

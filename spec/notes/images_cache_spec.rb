@@ -12,8 +12,8 @@ RSpec.describe Notes::ImagesCache do
     Dir.mktmpdir do |local_images_path|
       allow(Notes::Configuration).to receive(:local_images_path).and_return(local_images_path)
       result = images_cache.get(url: cleanshot_url, scope: "SCOPE")
-      expect(File.exist?(File.join(local_images_path, result))).to be_truthy
-      expect(File.exist?(File.join(local_images_path, "index.json"))).to be_truthy
+      expect(File).to exist(File.join(local_images_path, result))
+      expect(File).to exist(File.join(local_images_path, "index.json"))
       expect(File.extname(result)).to eq(".jpg")
     end
   end
