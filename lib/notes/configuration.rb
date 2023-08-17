@@ -40,6 +40,10 @@ class Notes::Configuration
       expand_path("images_path")
     end
 
+    def images_index_path
+      File.join(images_path, "index.json")
+    end
+
     private
 
     def expand_path(key)
