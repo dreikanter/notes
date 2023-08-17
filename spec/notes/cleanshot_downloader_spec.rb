@@ -12,7 +12,7 @@ RSpec.describe Notes::CleanshotDownloader do
     it "cache the image" do
       Dir.mktmpdir do |images_path|
         allow(Notes::Configuration).to receive(:images_path).and_return(images_path)
-        expect(service_call).to eq(url: cleanshot_url, file_name: cleanshot_original_file_name, content: image_content)
+        expect(service_call).to eq(original_file_name: cleanshot_original_file_name, content: image_content)
       end
     end
   end

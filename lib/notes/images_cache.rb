@@ -1,48 +1,41 @@
 class Notes::ImagesCache
   def get(url)
-    cached_images.fetch(url) { process(url) }
+    cached_images.fetch(url) do
+      image = Notes::CleanshotDownloader.new(url).download
+      save_image_file(**image).tap { add_to_index(url, _1) }
+    end
   end
 
   private
 
   def cached_images
-    File.exist?(index_path) ? read_index : {}
-  end
-
-  def read_index
-    JSON.parse(File.read(index_path))
+    return {} unless File.exist?(images_index_path)
+    JSON.parse(File.read(images_index_path))
   rescue StandardError
     {}
   end
 
-  def index_path
-    @index_path ||= File.join(images_path, "index.json")
-  end
-
-  def process(url)
-    image = Notes::CleanshotDownloader.new(url).download
-    path = save_image(image)
-    add_to_index(url, path)
-    path
+  def save_image_file(original_file_name:, content:)
+    FileUtils.mkdir_p(images_path)
+    file_name = normalized_file_name_for(original_file_name)
+    File.open(File.join(images_path, file_name), "wb").write(content)
+    file_name
   end
 
   def add_to_index(url, path)
-    File.write(index_path, JSON.pretty_generate(read_index.merge(url => path)))
+    File.write(images_index_path, JSON.pretty_generate(cached_images.merge(url => path)))
   end
 
-  def save_image(image)
-    FileUtils.mkdir_p(images_path)
-    file_name = new_file_name(File.extname(image[:file_name]))
-    File.open(file_name, "wb") { image[:content] }
-    File.basename(file_name)
+  def normalized_file_name_for(file_name)
+    "#{SecureRandom.uuid.gsub("-", "")}#{extension(file_name)}"
   end
 
-  def new_file_name(extension)
-    File.join(images_path, "#{SecureRandom.uuid.gsub("-", "")}#{normalized_extension(extension)}")
+  def extension(file_name)
+    File.extname(file_name).downcase.then { (_1 == ".jpeg") ? ".jpg" : _1 }
   end
 
-  def normalized_extension(extension)
-    extension.downcase.then { (_1 == ".jpeg") ? ".jpg" : _1 }
+  def images_index_path
+    Notes::Configuration.images_index_path
   end
 
   def images_path
