@@ -27,8 +27,8 @@ class Notes::ImagesCache
     File.open(path, mode) { _1.write(content) }
   end
 
-  def normalized_file_name_for(file_name:, scope:)
-    File.join(scope, "#{SecureRandom.uuid.gsub("-", "")}#{extension(file_name)}")
+  def normalized_file_name_for(file_name)
+    "#{SecureRandom.uuid.gsub("-", "")}#{extension(file_name)}"
   end
 
   def extension(file_name)
