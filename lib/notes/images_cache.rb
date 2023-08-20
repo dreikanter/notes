@@ -18,7 +18,7 @@ class Notes::ImagesCache
   def save_image_file(page_uid:, url:, original_file_name:, content:)
     file_name = normalized_file_name_for(original_file_name)
     write(path: File.join(assets_path, page_uid, file_name), mode: "wb", content: content)
-    image_data = { "file_name" => file_name, "page_uid" => page_uid }
+    image_data = {"file_name" => file_name, "page_uid" => page_uid}
     write(path: images_index_path, mode: "wt", content: JSON.pretty_generate(cached_images.merge(url => image_data)))
     image_data
   end
