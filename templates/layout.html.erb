@@ -23,8 +23,7 @@
     <footer>
       <hr class="!my-8">
       <p class="not-prose text-slate-400">
-        <% if page.respond_to?(:published_at) %><%= page.published_at.strftime("%e %b %Y") %> &middot;<% end %>
-        <a href="<%= configuration.feed_path %>">RSS</a>
+        <%= [components.timestamp(page), "<a href=\"#{configuration.feed_path}\">RSS</a>"].join("&middot;") %>
       </p>
     </footer>
   </div>
