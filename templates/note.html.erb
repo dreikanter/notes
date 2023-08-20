@@ -13,15 +13,6 @@
   <% if related_pages.any? %>
     <hr class="!my-8">
     <p>Somewhat related:</p>
-    <ul>
-      <% related_pages.each do |page| %>
-        <li>
-          <a href="<%= page.public_path %>"><%= page.title %></a>
-          <% if page.published_at %>
-            <small><time datetime="<%= page.published_at.to_time %>" class="text-slate-400"><%= page.published_at.strftime("%Y/%m/%d") %></time></small>
-          <% end %>
-        </li>
-      <% end %>
-    </ul>
+    <%= components.pages_list(related_pages) %>
   <% end %>
 <% end %>
