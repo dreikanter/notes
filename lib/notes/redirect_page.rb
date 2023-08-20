@@ -1,5 +1,3 @@
-require_relative "page"
-
 class Notes::RedirectPage < Notes::Page
   attr_reader :redirect_to
 

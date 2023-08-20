@@ -1,5 +1,3 @@
-require_relative "page"
-
 class Notes::TagPage < Notes::Page
   attr_reader :tag
 

@@ -1,5 +1,3 @@
-require_relative "page"
-
 class Notes::NotePage < Notes::Page
   attr_reader(
     :uid,
