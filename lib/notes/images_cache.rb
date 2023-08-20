@@ -1,8 +1,8 @@
 class Notes::ImagesCache
-  def get(url:, scope:)
+  def get(url:, page_uid:)
     cached_images.fetch(url) do
       image = Notes::CleanshotDownloader.new(url).download
-      save_image_file(scope: scope, url:, **image)
+      save_image_file(page_uid: page_uid, url:, **image)
     end
   end
 
