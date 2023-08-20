@@ -15,6 +15,7 @@ $:.unshift(File.expand_path(__dir__))
 
 module Notes
   autoload :CleanshotDownloader, "notes/cleanshot_downloader"
+  autoload :Components, "notes/components"
   autoload :Configuration, "notes/configuration"
   autoload :ImagesCache, "notes/images_cache"
   autoload :Logging, "notes/logging"

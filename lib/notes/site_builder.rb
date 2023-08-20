@@ -14,7 +14,7 @@ class Notes::SiteBuilder
   def render(page)
     local_path = page.local_path
     logger.info("rendering #{local_path}")
-    locals = {configuration: Notes::Configuration, site: site, page: page}
+    locals = {configuration: Notes::Configuration, site: site, page: page, components: Notes::Components}
     content = render_page(template: page.template, layout: page.layout, locals: locals)
     write(local_path: local_path, content: content)
     copy_attachments(local_path: local_path, attachments: page.attachments)
