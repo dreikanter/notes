@@ -108,7 +108,6 @@ DEPENDENCIES
   redcarpet (~> 3.6)
   rouge (~> 4.1)
   rspec (~> 3.12)
-  rubocop
   rubocop-rspec
   standard (>= 1.0)
   standard-performance
