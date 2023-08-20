@@ -24,7 +24,7 @@ class Notes::ImagesCache
 
   def write(path:, mode:, content:)
     FileUtils.mkdir_p(File.dirname(path))
-    File.open(path, mode).write(content)
+    File.open(path, mode) { _1.write(content) }
   end
 
   def normalized_file_name_for(file_name:, scope:)
