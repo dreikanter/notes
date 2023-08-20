@@ -3,7 +3,7 @@ class Notes::Components
     include DOTIW::Methods
 
     def tags_list(tags:, current_tag: nil)
-      tags.map { tag(tag: _1, highlight: _1 == current_tag) }.join
+      tags.sort.map { tag(tag: _1, highlight: _1 == current_tag) }.join
     end
 
     def pages_list(pages)
