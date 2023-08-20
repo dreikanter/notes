@@ -9,12 +9,7 @@
   <link rel="alternate" type="application/rss+xml" title="<%= configuration.site_name %>" href="<%= configuration.feed_url %>">
   <link rel="icon" href="data:," />
   <link href="/style.css" rel="stylesheet" type="text/css">
-  <style>
-    <%=
-      # SEE: https://github.com/rouge-ruby/rouge/tree/master/lib/rouge/themes
-      Rouge::Themes::Github.render(scope: ".highlight")
-    %>
-  </style>
+  <style><%= Rouge::Themes::Github.render(scope: ".highlight") %></style>
   <script src="https://cdn.counter.dev/script.js" data-id="d94a1231-14bd-47f9-ad32-cf1a9b40d2a5" data-utcoffset="2"></script>
 </head>
 <body>
