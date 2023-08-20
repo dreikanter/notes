@@ -23,7 +23,7 @@
     <footer>
       <hr class="!my-8">
       <p class="not-prose text-slate-400">
-        <%= [components.timestamp(page), "<a href=\"#{configuration.feed_path}\">RSS</a>"].join("&middot;") %>
+        <%= [components.page_timestamp(page), "<a href=\"#{configuration.feed_path}\">RSS</a>"].compact.join(" &middot; ") %>
       </p>
     </footer>
   </div>
