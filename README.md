@@ -1,20 +1,25 @@
-Public notes
+# Public notes automation
 
-Scripts:
+**Disclaimer:** This project is a single-purpose software built for personal use. It does not include a user manual and does not guarantee backward compatibility. I never intended to distribute this code, so there is no gemspec, public releases, changes history, or versioning. Very minimal customizability either.
 
-- `bin/build` — build the site.
-- `bin/serve` — run local HTTP server to preview the site.
+## Usage
 
-Environment variables:
+Setup:
 
-- `NOTES_PATH` — primary notes directory.
+```bash
+brew install caddy
+bundle
+yarn && yarn build
+```
 
-Note file name format is `YYYYMMDD_NNNN.md`, where
+Build everything:
 
-- `YYYYMMDD` — note creation date.
-- `NNNN` — unique number with zero indentation, preventing note id collisions.
+```bash
+NOTES_CONFIGURATION_PATH=~/src/notes/configuration.yml ~/src/notes/bin/build
+```
 
-Frontend assets:
+Run local HTTP server to preview the site:
 
-- `yarn` — install frontend dependencies.
-- `yarn build` — build stylesheets.
+```bash
+bin/serve
+```
