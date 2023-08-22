@@ -1,7 +1,5 @@
 class Notes::Components
   class << self
-    include DOTIW::Methods
-
     def tags_list(tags:, current_tag: nil)
       tags.sort.map { tag(tag: _1, highlight: _1 == current_tag) }.join
     end
@@ -13,29 +11,17 @@ class Notes::Components
         <<~HTML.strip
           <li>
             <a href="#{page.public_path}">#{page.title}</a>
-            <small class="text-slate-400">#{ago_timestamp(page)}</small>
+            <small class="text-slate-400">#{time_tag(time: page.published_at, format: "%Y/%m/%d")}</small>
           </li>
         HTML
       end.then { "<ul>#{_1.join}</ul>" }
     end
 
-    def ago_timestamp(page)
-      page.published_at&.then { time_tag(time: _1, label: ago(_1)) }
-    end
-
-    def page_timestamp(page)
-      page.published_at&.then { time_tag(time: _1, label: _1.strftime("%Y/%m/%d")) }
+    def time_tag(time:, format:)
+      time&.then { "<time datetime=\"#{_1.to_time}\">#{_1.strftime(format)}</time>" }
     end
 
     private
-
-    def time_tag(time:, label:)
-      "<time datetime=\"#{time.to_time}\">#{label}</time>"
-    end
-
-    def ago(time)
-      distance_of_time_in_words(time, Time.now, compact: true, highest_measure_only: true)
-    end
 
     def tag(tag:, highlight: false)
       classes = %w[block border rounded-md py-0 px-2 my-1 mr-2 no-underline font-normal]
