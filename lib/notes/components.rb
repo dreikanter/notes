@@ -1,3 +1,4 @@
+# NOTE: Make sure to update Tailwind safelist if some CSS classes are used here
 class Notes::Components
   class << self
     def tags_list(tags:, current_tag: nil)
