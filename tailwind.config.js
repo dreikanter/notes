@@ -4,8 +4,6 @@ module.exports = {
     "../notes/templates/**/*.html.erb"
   ],
   safelist: [
-    /^m[lrxy]-\d+/,
-    /^p[lrxy]-\d+/,
     "bg-slate-100",
     "bg-slate-500",
     "block",
@@ -18,6 +16,12 @@ module.exports = {
     "text-slate-100",
     "text-slate-400",
     "text-slate-800",
+    {
+      "pattern": /m(l|r|x|y)-.+/,
+    },
+    {
+      "pattern": /p(l|r|x|y)-.+/,
+    },
   ],
   theme: {
     extend: {
