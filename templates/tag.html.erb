@@ -1,7 +1,7 @@
-<main>
-  <div class="flex flex-row flex-wrap items-stretch !my-8">
-    <%= components.tags_list(tags: site.tags, current_tag: page.tag) %>
-  </div>
-  <p>Tagged with <a href="/tags/<%= page.tag %>"><%= page.tag %></a>:</p>
-  <%= components.pages_list(site.tagged_pages(page.tag)) %>
-</main>
+<div class="flex flex-row flex-wrap items-stretch !my-8">
+  <%= components.tags_list(tags: site.tags, current_tag: page.tag) %>
+</div>
+
+<p>Tagged with <a href="/tags/<%= page.tag %>"><%= page.tag %></a>:</p>
+
+<%= components.pages_list(site.tagged_pages(page.tag)) %>

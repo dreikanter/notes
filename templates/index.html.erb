@@ -1,7 +1,7 @@
-<main>
-  <div class="flex flex-row flex-wrap items-stretch !my-8">
-    <%= components.tags_list(tags: site.tags) %>
-  </div>
-  <p>Notes:</p>
-  <%= components.pages_list(site.note_pages) %>
-</main>
+<div class="flex flex-row flex-wrap items-stretch !my-8">
+  <%= components.tags_list(tags: site.tags) %>
+</div>
+
+<p>Notes:</p>
+
+<%= components.pages_list(site.note_pages) %>
