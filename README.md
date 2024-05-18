@@ -9,10 +9,22 @@ Setup:
 ```bash
 brew install caddy
 bundle
-yarn && yarn build
+yarn
 ```
 
-Build everything:
+Upgrade packages:
+
+```bash
+yarn upgrade --latest
+```
+
+Build CSS:
+
+```bash
+yarn build
+```
+
+Build the site:
 
 ```bash
 NOTES_CONFIGURATION_PATH=~/src/notes/configuration.yml ~/src/notes/bin/build
