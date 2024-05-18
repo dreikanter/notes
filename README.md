@@ -12,6 +12,12 @@ bundle
 yarn
 ```
 
+Upgrade packages:
+
+```bash
+yarn upgrade --latest
+```
+
 Build CSS:
 
 ```bash
