@@ -19,6 +19,7 @@ class Notes::NotePageBuilder
       url: url,
       local_path: local_path,
       public_path: public_path,
+      canonical_path: public_path,
       attachments: attachments
     )
   end

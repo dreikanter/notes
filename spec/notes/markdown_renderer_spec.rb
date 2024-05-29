@@ -7,10 +7,11 @@ RSpec.describe Notes::MarkdownRenderer do
   end
 
   let(:result) { Redcarpet::Markdown.new(renderer).render(markdown_source) }
+
   let(:process_image) do
     lambda do |url|
       raise unless url == "https://example.com/image.jpg"
-      "PROCESSED_IMAGE_URL"
+      { "file_name" => "PROCESSED_IMAGE_URL" }
     end
   end
 

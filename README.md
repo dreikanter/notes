@@ -18,6 +18,12 @@ Upgrade packages:
 yarn upgrade --latest
 ```
 
+Run the tests:
+
+```bash
+rspec
+```
+
 Build CSS:
 
 ```bash

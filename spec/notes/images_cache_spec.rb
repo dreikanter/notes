@@ -11,10 +11,14 @@ RSpec.describe Notes::ImagesCache do
   it "downloads an image to local cache" do
     Dir.mktmpdir do |assets_path|
       allow(Notes::Configuration).to receive(:assets_path).and_return(assets_path)
-      result = images_cache.get(url: cleanshot_url, scope: "SCOPE")
-      expect(File).to exist(File.join(assets_path, result))
+
+      result = images_cache.get(url: cleanshot_url, page_uid: "PAGE_UID")
+      page_uid = result.fetch("page_uid")
+      file_name = result.fetch("file_name")
+
+      expect(File).to exist(File.join(assets_path, page_uid, file_name))
       expect(File).to exist(File.join(assets_path, "index.json"))
-      expect(File.extname(result)).to eq(".jpg")
+      expect(File.extname(file_name)).to eq(".jpg")
     end
   end
 end

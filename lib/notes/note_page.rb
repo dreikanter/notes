@@ -4,7 +4,6 @@ class Notes::NotePage < Notes::Page
     :short_uid,
     :slug,
     :tags,
-    :title,
     :body,
     :url
   )
@@ -15,7 +14,6 @@ class Notes::NotePage < Notes::Page
     @short_uid ||= attributes[:short_uid]
     @slug ||= attributes[:slug]
     @tags ||= attributes[:tags]
-    @title ||= attributes[:title]
     @body ||= attributes[:body]
     @url ||= attributes[:url]
   end
