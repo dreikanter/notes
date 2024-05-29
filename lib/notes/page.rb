@@ -8,6 +8,7 @@ class Notes::Page
     @public_path = attributes[:public_path]
     @attachments = attributes[:attachments]
     @published_at = attributes[:published_at]
+    @title = attributes[:title]
   end
 
   def attachments
