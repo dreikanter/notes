@@ -36,6 +36,7 @@ class Notes::Site
       Notes::TagPage.new(
         local_path: "tags/#{tag}/index.html",
         public_path: "tags/#{tag}",
+        canonical_path: "tags/#{tag}",
         tag: tag
       )
     end
