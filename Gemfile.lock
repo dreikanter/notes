@@ -10,10 +10,17 @@ GEM
       bigdecimal
       rexml
     diff-lcs (1.5.1)
+    domain_name (0.6.20240107)
     hashdiff (1.1.0)
+    http (6.0.2)
+      http-cookie (~> 1.0)
+      llhttp (~> 0.6.1)
+    http-cookie (1.1.0)
+      domain_name (~> 0.5)
     json (2.7.2)
     language_server-protocol (3.17.0.3)
     lint_roller (1.1.0)
+    llhttp (0.6.1)
     method_source (1.1.0)
     parallel (1.24.0)
     parser (3.3.1.0)
@@ -95,8 +102,11 @@ GEM
 PLATFORMS
   arm64-darwin-21
   arm64-darwin-22
+  arm64-darwin-23
+  arm64-darwin-24
 
 DEPENDENCIES
+  http (~> 6.0)
   pry (~> 0.14.2)
   redcarpet (~> 3.6)
   rouge (~> 4.1)
