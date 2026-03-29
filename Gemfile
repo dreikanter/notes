@@ -13,3 +13,5 @@ group :development do
   gem "webmock", "~> 3.18"
   gem "yaml-lint", "~> 0.1.2", require: false
 end
+
+gem "http", "~> 6.0"

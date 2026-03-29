@@ -57,7 +57,8 @@ class Notes::NotePageBuilder
       autolink: true,
       strikethrough: true,
       space_after_headers: true,
-      highlight: true
+      highlight: true,
+      tables: true
     ).render(source_content.gsub(FRONTMATTER_PATETRN, ""))
   end
 
@@ -103,7 +104,7 @@ class Notes::NotePageBuilder
   end
 
   def metadata
-    @metadata ||= frontmatter? ? YAML.safe_load(source_content) : {}
+    @metadata ||= frontmatter? ? YAML.safe_load(source_content.match(FRONTMATTER_PATETRN)[1], permitted_classes: [Date, Time]) : {}
   end
 
   def frontmatter?
