@@ -57,7 +57,8 @@ class Notes::NotePageBuilder
       autolink: true,
       strikethrough: true,
       space_after_headers: true,
-      highlight: true
+      highlight: true,
+      tables: true
     ).render(source_content.gsub(FRONTMATTER_PATETRN, ""))
   end
 
