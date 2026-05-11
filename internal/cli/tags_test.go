@@ -16,6 +16,7 @@ import (
 // (e.g. --dry-run) into each other.
 func resetTagsFlags() {
 	_ = tagsRenameCmd.Flags().Set("dry-run", "false")
+	_ = tagsRmCmd.Flags().Set("dry-run", "false")
 }
 
 func runTags(t *testing.T, root string, args ...string) (string, error) {
@@ -207,6 +208,75 @@ func TestTagsRenameUnicode(t *testing.T) {
 	require.NoError(t, err)
 	assert.Contains(t, string(got), "tags:\n    - latte")
 	assert.Contains(t, string(got), "drink #latte please")
+}
+
+func TestTagsRmHappyPath(t *testing.T) {
+	root := t.TempDir()
+	writeIDJSON(t, root)
+	path := filepath.Join(root, "2026", "01", "20260101_1.md")
+	writeTagsTestNote(t, root, "2026/01/20260101_1.md",
+		"---\ntags: [work]\n---\n\nbody #work here\n")
+
+	stdout, stderr, err := runTagsSplit(t, root, "rm", "work")
+	require.NoError(t, err)
+	assert.Equal(t, path+"\n", stdout)
+	assert.Equal(t, "removed tag \"work\" from 1 note\n", stderr)
+
+	got, err := os.ReadFile(path)
+	require.NoError(t, err)
+	assert.NotContains(t, string(got), "- work")
+	assert.Contains(t, string(got), "body work here")
+	assert.NotContains(t, string(got), "#work")
+}
+
+func TestTagsRmDryRun(t *testing.T) {
+	root := t.TempDir()
+	writeIDJSON(t, root)
+	path := filepath.Join(root, "2026", "01", "20260101_1.md")
+	content := "---\ntags: [work]\n---\n\nbody #work here\n"
+	writeTagsTestNote(t, root, "2026/01/20260101_1.md", content)
+
+	stdout, stderr, err := runTagsSplit(t, root, "rm", "--dry-run", "work")
+	require.NoError(t, err)
+	assert.Equal(t, path+"\n", stdout)
+	assert.Equal(t, "would remove tag \"work\" from 1 note\n", stderr)
+
+	got, err := os.ReadFile(path)
+	require.NoError(t, err)
+	assert.Equal(t, content, string(got), "file should be untouched in dry-run")
+}
+
+func TestTagsRmEmptyArgFails(t *testing.T) {
+	root := t.TempDir()
+	writeIDJSON(t, root)
+
+	_, _, err := runTagsSplit(t, root, "rm", "")
+	require.Error(t, err)
+}
+
+func TestTagsRmNoMatches(t *testing.T) {
+	root := t.TempDir()
+	writeIDJSON(t, root)
+	writeTagsTestNote(t, root, "2026/01/20260101_1.md",
+		"---\ntags: [other]\n---\n\nbody\n")
+
+	stdout, stderr, err := runTagsSplit(t, root, "rm", "nope")
+	require.NoError(t, err)
+	assert.Empty(t, strings.TrimSpace(stdout))
+	assert.Equal(t, "no notes contained tag \"nope\"\n", stderr)
+}
+
+func TestTagsRmHappyPathPlural(t *testing.T) {
+	root := t.TempDir()
+	writeIDJSON(t, root)
+	writeTagsTestNote(t, root, "2026/01/20260101_1.md",
+		"---\ntags: [work]\n---\n\na\n")
+	writeTagsTestNote(t, root, "2026/01/20260102_2.md",
+		"---\ntags: [work]\n---\n\nb\n")
+
+	_, stderr, err := runTagsSplit(t, root, "rm", "work")
+	require.NoError(t, err)
+	assert.Equal(t, "removed tag \"work\" from 2 notes\n", stderr)
 }
 
 func TestTagsRenameCaseOnly(t *testing.T) {

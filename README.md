@@ -101,6 +101,10 @@ notes tags list                     # explicit alias
 notes tags rename work personal
 notes tags rename --dry-run work personal
 
+# Delete a tag across the whole store (frontmatter dropped, body '#name' becomes 'name')
+notes tags rm work
+notes tags rm --dry-run work
+
 # Print the effective runtime configuration (resolved store path, defaults, env vars)
 notes config
 ```

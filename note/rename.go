@@ -67,6 +67,87 @@ func RenameTag(store *OSStore, oldTag, newTag string, opts RenameOpts) (RenameRe
 	return result, nil
 }
 
+// RemoveOpts configures RemoveTag.
+type RemoveOpts struct {
+	// DryRun reports the modified paths without writing.
+	DryRun bool
+}
+
+// RemoveResult is the outcome of a RemoveTag call.
+type RemoveResult struct {
+	// ModifiedPaths lists the absolute path of every note that was (or
+	// would be, in dry-run mode) modified, in newest-first order.
+	ModifiedPaths []string
+}
+
+// RemoveTag deletes the tag (matched case-insensitively) across the store.
+// Frontmatter entries equal to name (case-insensitively) are dropped. Inline
+// body "#name" tokens have their leading '#' stripped, leaving the bare word
+// as prose. The store root is locked for the duration — including dry-run, so
+// the previewed path list reflects a consistent snapshot. On mid-run failure,
+// RemoveTag returns the error together with the partial path list of notes
+// already written.
+func RemoveTag(store *OSStore, name string, opts RemoveOpts) (RemoveResult, error) {
+	unlock, err := lockStoreRoot(store.Root())
+	if err != nil {
+		return RemoveResult{}, err
+	}
+	defer unlock()
+
+	lowerName := strings.ToLower(name)
+
+	entries, err := store.All(WithTag(name))
+	if err != nil {
+		return RemoveResult{}, err
+	}
+
+	stripFn := func(token []byte) []byte { return token }
+
+	var result RemoveResult
+	for _, entry := range entries {
+		newTags, tagsChanged := dropMetaTag(entry.Meta.Tags, lowerName)
+		newBody, bodyN := ReplaceBodyHashtags([]byte(entry.Body), lowerName, stripFn)
+
+		if !tagsChanged && bodyN == 0 {
+			continue
+		}
+
+		entry.Meta.Tags = newTags
+		entry.Body = string(newBody)
+
+		if opts.DryRun {
+			result.ModifiedPaths = append(result.ModifiedPaths, store.AbsPath(entry))
+			continue
+		}
+
+		saved, err := store.Put(entry)
+		if err != nil {
+			return result, err
+		}
+		result.ModifiedPaths = append(result.ModifiedPaths, store.AbsPath(saved))
+	}
+
+	return result, nil
+}
+
+// dropMetaTag returns the tag list with every case-variant of lowerName
+// removed, and whether any change occurred.
+func dropMetaTag(tags []string, lowerName string) ([]string, bool) {
+	matched := false
+	out := make([]string, 0, len(tags))
+	for _, t := range tags {
+		if strings.ToLower(t) == lowerName {
+			matched = true
+			continue
+		}
+		out = append(out, t)
+	}
+	if !matched {
+		return tags, false
+	}
+	return out, true
+}
+
 // rewriteMetaTags returns the rewritten tag list and whether any change
 // occurred. Every case-variant of lowerOld is dropped; if at least one was
 // present, newTag is appended and any pre-existing case variant of newTag
