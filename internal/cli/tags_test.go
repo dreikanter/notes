@@ -11,8 +11,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// resetTagsFlags clears subcommand flag state that cobra retains between
+// rootCmd.Execute() invocations, so independent tests don't leak settings
+// (e.g. --dry-run) into each other.
+func resetTagsFlags() {
+	_ = tagsRenameCmd.Flags().Set("dry-run", "false")
+}
+
 func runTags(t *testing.T, root string, args ...string) (string, error) {
 	t.Helper()
+	resetTagsFlags()
 
 	buf := new(bytes.Buffer)
 	rootCmd.SetOut(buf)
@@ -25,6 +33,7 @@ func runTags(t *testing.T, root string, args ...string) (string, error) {
 
 func runTagsSplit(t *testing.T, root string, args ...string) (string, string, error) {
 	t.Helper()
+	resetTagsFlags()
 
 	outBuf := new(bytes.Buffer)
 	errBuf := new(bytes.Buffer)
@@ -112,13 +121,25 @@ func TestTagsRenameHappyPath(t *testing.T) {
 	stdout, stderr, err := runTagsSplit(t, root, "rename", "work", "personal")
 	require.NoError(t, err)
 	assert.Equal(t, path+"\n", stdout)
-	assert.Contains(t, stderr, "renamed")
-	assert.Contains(t, stderr, "in 1 note\n")
+	assert.Equal(t, "renamed \"work\" → \"personal\" in 1 note\n", stderr)
 
 	got, err := os.ReadFile(path)
 	require.NoError(t, err)
 	assert.Contains(t, string(got), "tags:\n    - personal")
 	assert.Contains(t, string(got), "body #personal here")
+}
+
+func TestTagsRenameHappyPathPlural(t *testing.T) {
+	root := t.TempDir()
+	writeIDJSON(t, root)
+	writeTagsTestNote(t, root, "2026/01/20260101_1.md",
+		"---\ntags: [work]\n---\n\na\n")
+	writeTagsTestNote(t, root, "2026/01/20260102_2.md",
+		"---\ntags: [work]\n---\n\nb\n")
+
+	_, stderr, err := runTagsSplit(t, root, "rename", "work", "personal")
+	require.NoError(t, err)
+	assert.Equal(t, "renamed \"work\" → \"personal\" in 2 notes\n", stderr)
 }
 
 func TestTagsRenameDryRun(t *testing.T) {
@@ -131,7 +152,7 @@ func TestTagsRenameDryRun(t *testing.T) {
 	stdout, stderr, err := runTagsSplit(t, root, "rename", "--dry-run", "work", "personal")
 	require.NoError(t, err)
 	assert.Equal(t, path+"\n", stdout)
-	assert.Contains(t, stderr, "would rename")
+	assert.Equal(t, "would rename \"work\" → \"personal\" in 1 note\n", stderr)
 
 	got, err := os.ReadFile(path)
 	require.NoError(t, err)
@@ -167,5 +188,41 @@ func TestTagsRenameNoMatches(t *testing.T) {
 	stdout, stderr, err := runTagsSplit(t, root, "rename", "nope", "x")
 	require.NoError(t, err)
 	assert.Empty(t, strings.TrimSpace(stdout))
-	assert.Contains(t, stderr, `no notes contained tag "nope"`)
+	assert.Equal(t, "no notes contained tag \"nope\"\n", stderr)
+}
+
+func TestTagsRenameUnicode(t *testing.T) {
+	root := t.TempDir()
+	writeIDJSON(t, root)
+	path := filepath.Join(root, "2026", "01", "20260101_1.md")
+	writeTagsTestNote(t, root, "2026/01/20260101_1.md",
+		"---\ntags: [café]\n---\n\ndrink #café please\n")
+
+	stdout, stderr, err := runTagsSplit(t, root, "rename", "café", "latte")
+	require.NoError(t, err)
+	assert.Equal(t, path+"\n", stdout)
+	assert.Equal(t, "renamed \"café\" → \"latte\" in 1 note\n", stderr)
+
+	got, err := os.ReadFile(path)
+	require.NoError(t, err)
+	assert.Contains(t, string(got), "tags:\n    - latte")
+	assert.Contains(t, string(got), "drink #latte please")
+}
+
+func TestTagsRenameCaseOnly(t *testing.T) {
+	root := t.TempDir()
+	writeIDJSON(t, root)
+	path := filepath.Join(root, "2026", "01", "20260101_1.md")
+	writeTagsTestNote(t, root, "2026/01/20260101_1.md",
+		"---\ntags: [work]\n---\n\nbody #work here\n")
+
+	stdout, stderr, err := runTagsSplit(t, root, "rename", "work", "WORK")
+	require.NoError(t, err)
+	assert.Equal(t, path+"\n", stdout)
+	assert.Equal(t, "renamed \"work\" → \"WORK\" in 1 note\n", stderr)
+
+	got, err := os.ReadFile(path)
+	require.NoError(t, err)
+	assert.Contains(t, string(got), "tags:\n    - WORK")
+	assert.Contains(t, string(got), "body #WORK here")
 }
