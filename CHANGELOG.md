@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-05-11
+
 ### Added
 
 - `notes tags rename <old> <new>` renames a tag across the store, rewriting frontmatter `tags:` lists and body `#hashtag` tokens. Matches case-insensitively; writes the new name literally. Supports `--dry-run`.
