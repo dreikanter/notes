@@ -45,7 +45,7 @@ func TestRenameTag_FrontmatterOnly(t *testing.T) {
 	s := newOSTestStore(t)
 	day := time.Date(2026, 1, 15, 0, 0, 0, 0, time.UTC)
 
-	e := putForRename(t, s, day, []string{"work", "other"}, "no body tag\n")
+	putForRename(t, s, day, []string{"work", "other"}, "no body tag\n")
 
 	res, err := RenameTag(s, "work", "personal", RenameOpts{})
 	require.NoError(t, err)
@@ -53,7 +53,6 @@ func TestRenameTag_FrontmatterOnly(t *testing.T) {
 
 	tags := readTags(t, res.ModifiedPaths[0])
 	assert.ElementsMatch(t, []string{"other", "personal"}, tags)
-	_ = e
 }
 
 func TestRenameTag_BodyOnly(t *testing.T) {
