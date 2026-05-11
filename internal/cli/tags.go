@@ -35,10 +35,13 @@ var tagsRenameCmd = &cobra.Command{
 		newTag := args[1]
 
 		if oldTag == "" {
-			return fmt.Errorf("old tag must be non-empty")
+			return fmt.Errorf("old tag is empty")
+		}
+		if newTag == "" {
+			return fmt.Errorf("new tag is empty")
 		}
 		if err := note.ValidateTag(newTag); err != nil {
-			return err
+			return fmt.Errorf("new tag: %w", err)
 		}
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
