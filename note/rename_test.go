@@ -59,17 +59,18 @@ func TestRenameTag_BodyOnly(t *testing.T) {
 	s := newOSTestStore(t)
 	day := time.Date(2026, 1, 15, 0, 0, 0, 0, time.UTC)
 
-	putForRename(t, s, day, nil, "see #work please\n")
+	// Body has the renamed tag plus an unrelated hashtag. The unrelated
+	// hashtag is promoted to frontmatter on write (documented behavior).
+	putForRename(t, s, day, nil, "see #work and #foo please\n")
 
 	res, err := RenameTag(s, "work", "personal", RenameOpts{})
 	require.NoError(t, err)
 	require.Len(t, res.ModifiedPaths, 1)
 
 	body := readBody(t, res.ModifiedPaths[0])
-	assert.Equal(t, "see #personal please\n", body)
+	assert.Equal(t, "see #personal and #foo please\n", body)
 	tags := readTags(t, res.ModifiedPaths[0])
-	// body-only tag becomes an explicit frontmatter tag after rewrite.
-	assert.Contains(t, tags, "personal")
+	assert.ElementsMatch(t, []string{"foo", "personal"}, tags)
 }
 
 func TestRenameTag_FrontmatterAndBody(t *testing.T) {
