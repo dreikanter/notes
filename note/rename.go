@@ -20,16 +20,15 @@ type RenameResult struct {
 // RenameTag rewrites every occurrence of oldTag (matched case-insensitively)
 // across the store, both in frontmatter "tags:" lists and in body "#hashtag"
 // tokens, replacing it with newTag written literally. The store root is
-// locked for the duration. On mid-run failure, RenameTag returns the error
-// together with the partial path list of notes already written.
+// locked for the duration — including dry-run, so the previewed path list
+// reflects a consistent snapshot. On mid-run failure, RenameTag returns the
+// error together with the partial path list of notes already written.
 func RenameTag(store *OSStore, oldTag, newTag string, opts RenameOpts) (RenameResult, error) {
-	if !opts.DryRun {
-		unlock, err := lockStoreRoot(store.Root())
-		if err != nil {
-			return RenameResult{}, err
-		}
-		defer unlock()
+	unlock, err := lockStoreRoot(store.Root())
+	if err != nil {
+		return RenameResult{}, err
 	}
+	defer unlock()
 
 	lowerOld := strings.ToLower(oldTag)
 
