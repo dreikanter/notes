@@ -37,12 +37,13 @@ func RenameTag(store *OSStore, oldTag, newTag string, opts RenameOpts) (RenameRe
 		return RenameResult{}, err
 	}
 
+	replacement := []byte("#" + newTag)
+	replaceFn := func(_ []byte) []byte { return replacement }
+
 	var result RenameResult
 	for _, entry := range entries {
 		newTags, tagsChanged := rewriteMetaTags(entry.Meta.Tags, lowerOld, newTag)
-		newBody, bodyN := ReplaceBodyHashtags([]byte(entry.Body), lowerOld, func(_ []byte) []byte {
-			return []byte("#" + newTag)
-		})
+		newBody, bodyN := ReplaceBodyHashtags([]byte(entry.Body), lowerOld, replaceFn)
 
 		if !tagsChanged && bodyN == 0 {
 			continue
