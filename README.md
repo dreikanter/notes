@@ -95,6 +95,11 @@ notes update 8823 --private
 
 # List all tags (frontmatter + body hashtags)
 notes tags
+notes tags list                     # explicit alias
+
+# Rename a tag across the whole store
+notes tags rename work personal
+notes tags rename --dry-run work personal
 
 # Print the effective runtime configuration (resolved store path, defaults, env vars)
 notes config

@@ -2,13 +2,20 @@
 
 ## [Unreleased]
 
-### Fixed
+### Added
 
-- `notes --version` no longer prints a redundant `version v...`; the output is now `notes vX.Y.Z`.
+- `notes tags rename <old> <new>` renames a tag across the store, rewriting frontmatter `tags:` lists and body `#hashtag` tokens. Matches case-insensitively; writes the new name literally. Supports `--dry-run`.
+- `notes tags list` (explicit alias for `notes tags`).
 
 ### Changed
 
+- Hashtag tokens now accept unicode letters and digits in addition to `[A-Za-z0-9_-]`. Adjacent-prose detection is also unicode-aware: `café#bar` no longer extracts `bar`. Stores using non-ASCII text in notes may see `notes tags` and `notes ls --tag` results shift accordingly.
+- A body-only tag becomes an explicit frontmatter tag after `notes tags rename` rewrites a note (consistent with how `notes update --tag` already behaves).
 - Adopt an Unreleased-first changelog and release-PR versioning workflow so multiple PRs can be bundled into one release ([#271]).
+
+### Fixed
+
+- `notes --version` no longer prints a redundant `version v...`; the output is now `notes vX.Y.Z`.
 
 [#271]: https://github.com/dreikanter/notes/pull/271
 
