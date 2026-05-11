@@ -211,6 +211,29 @@ func TestReplaceBodyHashtagsNoMatch(t *testing.T) {
 	require.Equal(t, "no tag here, just #other", string(out))
 }
 
+func TestReplaceBodyHashtagsStripModePreservesCase(t *testing.T) {
+	strip := func(token []byte) []byte { return token }
+	cases := []struct {
+		name  string
+		in    string
+		match string
+		want  string
+		n     int
+	}{
+		{"lower", "see #work here", "work", "see work here", 1},
+		{"upper", "see #WORK here", "work", "see WORK here", 1},
+		{"unicode", "drink #Café please", "café", "drink Café please", 1},
+		{"mixed body", "tag #work and #other", "work", "tag work and #other", 1},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			out, n := ReplaceBodyHashtags([]byte(c.in), c.match, strip)
+			assert.Equal(t, c.n, n)
+			assert.Equal(t, c.want, string(out))
+		})
+	}
+}
+
 func TestReplaceBodyHashtagsMultiplePerLine(t *testing.T) {
 	replace := func(_ []byte) []byte { return []byte("#personal") }
 	in := "#work and #work on same line\nand #work next\n"

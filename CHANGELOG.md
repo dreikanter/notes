@@ -5,6 +5,7 @@
 ### Added
 
 - `notes tags rename <old> <new>` renames a tag across the store, rewriting frontmatter `tags:` lists and body `#hashtag` tokens. Matches case-insensitively; writes the new name literally. Supports `--dry-run`.
+- `notes tags rm <name>` deletes a tag across the store. Drops the tag from frontmatter `tags:` lists and strips the leading `#` from inline `#name` tokens in note bodies, leaving the bare word as prose. Matches case-insensitively. Supports `--dry-run`.
 - `notes tags list` (explicit alias for `notes tags`).
 
 ### Changed

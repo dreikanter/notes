@@ -75,6 +75,48 @@ var tagsRenameCmd = &cobra.Command{
 	},
 }
 
+var tagsRmCmd = &cobra.Command{
+	Use:   "rm <name>",
+	Short: "Delete a tag across the store (drops frontmatter entries, strips '#' from body tokens)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		name := args[0]
+
+		if name == "" {
+			return fmt.Errorf("tag is empty")
+		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+
+		store, err := notesStore()
+		if err != nil {
+			return err
+		}
+
+		res, rmErr := note.RemoveTag(store, name, note.RemoveOpts{DryRun: dryRun})
+
+		out := cmd.OutOrStdout()
+		errOut := cmd.ErrOrStderr()
+		for _, p := range res.ModifiedPaths {
+			fmt.Fprintln(out, p)
+		}
+
+		n := len(res.ModifiedPaths)
+		switch {
+		case rmErr != nil:
+			fmt.Fprintf(errOut, "partial: removed in %s before error\n", pluralNotes(n))
+			return rmErr
+		case n == 0:
+			fmt.Fprintf(errOut, "no notes contained tag %q\n", name)
+		case dryRun:
+			fmt.Fprintf(errOut, "would remove tag %q from %s\n", name, pluralNotes(n))
+		default:
+			fmt.Fprintf(errOut, "removed tag %q from %s\n", name, pluralNotes(n))
+		}
+		return nil
+	},
+}
+
 func pluralNotes(n int) string {
 	if n == 1 {
 		return "1 note"
@@ -111,7 +153,9 @@ func runTagsList(cmd *cobra.Command) error {
 
 func init() {
 	tagsRenameCmd.Flags().Bool("dry-run", false, "print modifications without writing")
+	tagsRmCmd.Flags().Bool("dry-run", false, "print modifications without writing")
 	tagsCmd.AddCommand(tagsListCmd)
 	tagsCmd.AddCommand(tagsRenameCmd)
+	tagsCmd.AddCommand(tagsRmCmd)
 	rootCmd.AddCommand(tagsCmd)
 }
