@@ -113,7 +113,7 @@ func TestTagsRenameHappyPath(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, path+"\n", stdout)
 	assert.Contains(t, stderr, "renamed")
-	assert.Contains(t, stderr, "in 1 notes")
+	assert.Contains(t, stderr, "in 1 note\n")
 
 	got, err := os.ReadFile(path)
 	require.NoError(t, err)

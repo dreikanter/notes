@@ -59,17 +59,24 @@ var tagsRenameCmd = &cobra.Command{
 		n := len(res.ModifiedPaths)
 		switch {
 		case renameErr != nil:
-			fmt.Fprintf(errOut, "partial: renamed in %d notes before error\n", n)
+			fmt.Fprintf(errOut, "partial: renamed in %s before error\n", pluralNotes(n))
 			return renameErr
 		case n == 0:
 			fmt.Fprintf(errOut, "no notes contained tag %q\n", oldTag)
 		case dryRun:
-			fmt.Fprintf(errOut, "would rename %q → %q in %d notes\n", oldTag, newTag, n)
+			fmt.Fprintf(errOut, "would rename %q → %q in %s\n", oldTag, newTag, pluralNotes(n))
 		default:
-			fmt.Fprintf(errOut, "renamed %q → %q in %d notes\n", oldTag, newTag, n)
+			fmt.Fprintf(errOut, "renamed %q → %q in %s\n", oldTag, newTag, pluralNotes(n))
 		}
 		return nil
 	},
+}
+
+func pluralNotes(n int) string {
+	if n == 1 {
+		return "1 note"
+	}
+	return fmt.Sprintf("%d notes", n)
 }
 
 func runTagsList(cmd *cobra.Command) error {
