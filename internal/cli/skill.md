@@ -170,11 +170,17 @@ Prints the resolved store path, default values for per-command flags, and the pr
 
 ```sh
 notes skill                              # print this skill to stdout
-notes skill --install                    # write into every detected agent's skills directory
-notes skill --install --agent=claude     # explicit single-agent install
+notes skill --install                    # write into every detected skills-root location
+notes skill --install --target=claude    # explicit single-location install
 notes skill --install --force            # overwrite an existing diverging copy
 notes skill --install --dry-run          # print planned actions, write nothing
 ```
+
+All targets share the [Agent Skills](https://agentskills.io/specification) format. Supported `--target` values:
+
+- `claude` → `~/.claude/skills/notes/SKILL.md` (read by Claude Code)
+- `pi` → `~/.pi/agent/skills/notes/SKILL.md` (read by Pi)
+- `agents` → `~/.agents/skills/notes/SKILL.md` (cross-harness convention read by Codex, Cursor, OpenCode, Pi, VS Code Copilot, Warp, and others)
 
 ## Editing Notes
 

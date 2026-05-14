@@ -110,10 +110,10 @@ notes config
 
 # Print an AI-assistant skill describing how to drive notes
 notes skill
-notes skill --install                # auto-detect agents, install into each
-notes skill --install --agent=claude # install into a specific agent
-notes skill --install --dry-run      # show planned actions, write nothing
-notes skill --install --force        # overwrite a diverging existing skill
+notes skill --install                 # auto-detect skills roots, install into each
+notes skill --install --target=claude # install into a specific target (claude, pi, agents)
+notes skill --install --dry-run       # show planned actions, write nothing
+notes skill --install --force         # overwrite a diverging existing skill
 ```
 
 Composing with the shell — since most commands take an ID, use `ls` or
