@@ -17,7 +17,7 @@ func runSkill(t *testing.T, args ...string) (string, error) {
 	skillCmd.ResetFlags()
 	registerSkillFlags()
 	skillInstall = false
-	skillAgent = ""
+	skillTarget = ""
 	skillForce = false
 	skillDryRun = false
 
@@ -31,16 +31,23 @@ func runSkill(t *testing.T, args ...string) (string, error) {
 }
 
 // sandboxHome redirects the package-level homeDir resolver to a fresh
-// tempdir for the lifetime of the test. Returns the sandbox path.
-func sandboxHome(t *testing.T, withClaudeSkills bool) string {
+// tempdir for the lifetime of the test. Any target names passed in
+// installed have their RootDir() materialised inside the sandbox so
+// Detect() succeeds for them.
+func sandboxHome(t *testing.T, installed ...string) string {
 	t.Helper()
 	dir := t.TempDir()
-	if withClaudeSkills {
-		require.NoError(t, os.MkdirAll(filepath.Join(dir, ".claude", "skills"), 0o755))
-	}
 	prev := homeDir
 	homeDir = func() (string, error) { return dir, nil }
 	t.Cleanup(func() { homeDir = prev })
+
+	for _, name := range installed {
+		tg := findTarget(name)
+		require.NotNil(t, tg, "unknown target %q", name)
+		root, err := tg.RootDir()
+		require.NoError(t, err)
+		require.NoError(t, os.MkdirAll(root, 0o755))
+	}
 	return dir
 }
 
@@ -98,9 +105,9 @@ func TestSkillStdoutMentionsStoreLayout(t *testing.T) {
 }
 
 func TestSkillFlagWithoutInstallIsError(t *testing.T) {
-	_, err := runSkill(t, "--agent=claude")
+	_, err := runSkill(t, "--target=claude")
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "--agent requires --install")
+	assert.Contains(t, err.Error(), "--target requires --install")
 
 	_, err = runSkill(t, "--force")
 	require.Error(t, err)
@@ -111,17 +118,17 @@ func TestSkillFlagWithoutInstallIsError(t *testing.T) {
 	assert.Contains(t, err.Error(), "--dry-run requires --install")
 }
 
-func TestSkillUnknownAgent(t *testing.T) {
-	sandboxHome(t, true)
-	_, err := runSkill(t, "--install", "--agent=bogus")
+func TestSkillUnknownTarget(t *testing.T) {
+	sandboxHome(t, "claude")
+	_, err := runSkill(t, "--install", "--target=bogus")
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "unknown agent")
+	assert.Contains(t, err.Error(), "unknown target")
 	assert.Contains(t, err.Error(), "claude")
 }
 
 func TestSkillInstallCreate(t *testing.T) {
-	home := sandboxHome(t, true)
-	out, err := runSkill(t, "--install", "--agent=claude")
+	home := sandboxHome(t, "claude")
+	out, err := runSkill(t, "--install", "--target=claude")
 	require.NoError(t, err)
 
 	target := filepath.Join(home, ".claude", "skills", "notes", "SKILL.md")
@@ -138,15 +145,15 @@ func TestSkillInstallCreate(t *testing.T) {
 }
 
 func TestSkillInstallSkipOnRerun(t *testing.T) {
-	home := sandboxHome(t, true)
-	_, err := runSkill(t, "--install", "--agent=claude")
+	home := sandboxHome(t, "claude")
+	_, err := runSkill(t, "--install", "--target=claude")
 	require.NoError(t, err)
 
 	target := filepath.Join(home, ".claude", "skills", "notes", "SKILL.md")
 	beforeStat, err := os.Stat(target)
 	require.NoError(t, err)
 
-	out, err := runSkill(t, "--install", "--agent=claude")
+	out, err := runSkill(t, "--install", "--target=claude")
 	require.NoError(t, err)
 	assert.Contains(t, out, "skip")
 
@@ -156,14 +163,14 @@ func TestSkillInstallSkipOnRerun(t *testing.T) {
 }
 
 func TestSkillInstallConflictWithoutForce(t *testing.T) {
-	home := sandboxHome(t, true)
-	_, err := runSkill(t, "--install", "--agent=claude")
+	home := sandboxHome(t, "claude")
+	_, err := runSkill(t, "--install", "--target=claude")
 	require.NoError(t, err)
 
 	target := filepath.Join(home, ".claude", "skills", "notes", "SKILL.md")
 	require.NoError(t, os.WriteFile(target, []byte("local changes"), 0o644))
 
-	out, err := runSkill(t, "--install", "--agent=claude")
+	out, err := runSkill(t, "--install", "--target=claude")
 	require.Error(t, err, "conflict must exit non-zero")
 	assert.Contains(t, out, "conflict")
 
@@ -173,14 +180,14 @@ func TestSkillInstallConflictWithoutForce(t *testing.T) {
 }
 
 func TestSkillInstallForceOverwrites(t *testing.T) {
-	home := sandboxHome(t, true)
-	_, err := runSkill(t, "--install", "--agent=claude")
+	home := sandboxHome(t, "claude")
+	_, err := runSkill(t, "--install", "--target=claude")
 	require.NoError(t, err)
 
 	target := filepath.Join(home, ".claude", "skills", "notes", "SKILL.md")
 	require.NoError(t, os.WriteFile(target, []byte("local changes"), 0o644))
 
-	out, err := runSkill(t, "--install", "--agent=claude", "--force")
+	out, err := runSkill(t, "--install", "--target=claude", "--force")
 	require.NoError(t, err)
 	assert.Contains(t, out, "overwrite")
 
@@ -190,8 +197,8 @@ func TestSkillInstallForceOverwrites(t *testing.T) {
 }
 
 func TestSkillInstallDryRun(t *testing.T) {
-	home := sandboxHome(t, true)
-	out, err := runSkill(t, "--install", "--agent=claude", "--dry-run")
+	home := sandboxHome(t, "claude")
+	out, err := runSkill(t, "--install", "--target=claude", "--dry-run")
 	require.NoError(t, err)
 	assert.Contains(t, out, "would create")
 
@@ -201,7 +208,7 @@ func TestSkillInstallDryRun(t *testing.T) {
 }
 
 func TestSkillInstallAutoDetectFindsClaude(t *testing.T) {
-	home := sandboxHome(t, true)
+	home := sandboxHome(t, "claude")
 	out, err := runSkill(t, "--install")
 	require.NoError(t, err)
 	assert.Contains(t, out, "create")
@@ -212,59 +219,76 @@ func TestSkillInstallAutoDetectFindsClaude(t *testing.T) {
 }
 
 func TestSkillInstallAutoDetectNoneFound(t *testing.T) {
-	sandboxHome(t, false)
+	sandboxHome(t)
 	_, err := runSkill(t, "--install")
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "no supported agent detected")
+	assert.Contains(t, err.Error(), "no supported target detected")
 	assert.Contains(t, err.Error(), "claude")
 }
 
-func TestSkillInstallMissingParentDirectoryErrors(t *testing.T) {
-	sandboxHome(t, false) // no ~/.claude/skills
-	_, err := runSkill(t, "--install", "--agent=claude")
+func TestSkillInstallMissingRootDirectoryErrors(t *testing.T) {
+	sandboxHome(t) // no ~/.claude/skills
+	_, err := runSkill(t, "--install", "--target=claude")
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "agent skills directory not found")
+	assert.Contains(t, err.Error(), "skills root directory not found")
 }
 
-func TestSkillInstallMultipleAgents(t *testing.T) {
-	home := sandboxHome(t, true)
-
-	fakeDir := filepath.Join(home, ".fake", "skills")
-	require.NoError(t, os.MkdirAll(fakeDir, 0o755))
-
-	prev := agents
-	agents = append(append([]agentTarget{}, agents...), agentTarget{
-		Name: "fake",
-		PathFor: func() (string, error) {
-			h, err := homeDir()
-			if err != nil {
-				return "", err
-			}
-			return filepath.Join(h, ".fake", "skills", "notes", "SKILL.md"), nil
-		},
-		Detect: func() (bool, error) {
-			h, err := homeDir()
-			if err != nil {
-				return false, err
-			}
-			_, statErr := os.Stat(filepath.Join(h, ".fake", "skills"))
-			return statErr == nil, nil
-		},
-	})
-	t.Cleanup(func() { agents = prev })
+func TestSkillInstallAllTargetsAutoDetect(t *testing.T) {
+	home := sandboxHome(t, "claude", "pi", "agents")
 
 	out, err := runSkill(t, "--install")
 	require.NoError(t, err)
-	assert.Contains(t, out, "claude")
-	assert.Contains(t, out, "fake")
-	assert.FileExists(t, filepath.Join(home, ".claude", "skills", "notes", "SKILL.md"))
-	assert.FileExists(t, filepath.Join(home, ".fake", "skills", "notes", "SKILL.md"))
+	for _, name := range []string{"claude", "pi", "agents"} {
+		assert.Contains(t, out, name)
+	}
+
+	for _, p := range []string{
+		filepath.Join(home, ".claude", "skills", "notes", "SKILL.md"),
+		filepath.Join(home, ".pi", "agent", "skills", "notes", "SKILL.md"),
+		filepath.Join(home, ".agents", "skills", "notes", "SKILL.md"),
+	} {
+		assert.FileExists(t, p)
+	}
 }
 
-func TestSkillHelpDocumentsAgents(t *testing.T) {
+func TestSkillInstallEachTargetExplicit(t *testing.T) {
+	cases := []struct {
+		name string
+		path []string
+	}{
+		{"claude", []string{".claude", "skills", "notes", "SKILL.md"}},
+		{"pi", []string{".pi", "agent", "skills", "notes", "SKILL.md"}},
+		{"agents", []string{".agents", "skills", "notes", "SKILL.md"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			home := sandboxHome(t, tc.name)
+			out, err := runSkill(t, "--install", "--target="+tc.name)
+			require.NoError(t, err)
+			assert.Contains(t, out, "create")
+
+			target := filepath.Join(append([]string{home}, tc.path...)...)
+			assert.FileExists(t, target)
+		})
+	}
+}
+
+func TestSkillHelpDocumentsTargets(t *testing.T) {
 	out, err := runSkill(t, "--help")
 	require.NoError(t, err)
-	assert.Contains(t, out, "Supported --agent values:")
-	assert.Contains(t, out, "claude")
-	assert.Contains(t, out, "~/.claude/skills/notes/SKILL.md")
+	assert.Contains(t, out, "Supported --target values:")
+	for _, fragment := range []string{
+		"claude",
+		"~/.claude/skills/notes/SKILL.md",
+		"Claude Code",
+		"pi",
+		"~/.pi/agent/skills/notes/SKILL.md",
+		"Pi",
+		"agents",
+		"~/.agents/skills/notes/SKILL.md",
+		"Codex",
+		"agentskills.io/specification",
+	} {
+		assert.Contains(t, out, fragment)
+	}
 }

@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-05-14
+
+### Added
+
+- `notes skill --install` now supports two additional install targets alongside `claude`: `pi` (writes to `~/.pi/agent/skills/notes/SKILL.md`) and `agents` (writes to `~/.agents/skills/notes/SKILL.md`, the cross-harness convention read by Codex, Cursor, OpenCode, Pi, VS Code Copilot, Warp, and others). All targets share the [Agent Skills](https://agentskills.io/specification) `SKILL.md` format. Auto-detect installs into every target whose skills-root directory exists; pass `--target=<name>` to install into a single one. The `--agent` flag is renamed to `--target` since each target names a filesystem location, not an agent — multiple harnesses read the same location.
+
 ## [0.4.1] - 2026-05-14
 
 ### Added
