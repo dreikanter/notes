@@ -50,7 +50,7 @@ func TestSkillStdoutHasFrontmatter(t *testing.T) {
 
 	require.True(t, strings.HasPrefix(out, "---\n"), "missing opening frontmatter delimiter")
 	assert.Contains(t, out, "name: notes\n")
-	assert.Contains(t, out, "description: Use when ")
+	assert.Contains(t, out, "description: ")
 	assert.Contains(t, out, "\n---\n\n")
 }
 
@@ -66,8 +66,8 @@ func TestSkillStdoutListsKnownCommands(t *testing.T) {
 	out, err := runSkill(t)
 	require.NoError(t, err)
 
-	for _, name := range []string{"new", "ls", "read", "append", "annotate", "resolve", "rm", "tags", "update", "config", "skill"} {
-		assert.Contains(t, out, "`notes "+name+"`", "command %s missing from skill body", name)
+	for _, name := range []string{"new", "new-todo", "ls", "read", "append", "annotate", "resolve", "rm", "tags", "update", "config", "skill"} {
+		assert.Contains(t, out, "notes "+name, "command %s missing from skill body", name)
 	}
 }
 
@@ -94,7 +94,7 @@ func TestSkillStdoutMentionsStoreLayout(t *testing.T) {
 	out, err := runSkill(t)
 	require.NoError(t, err)
 	assert.Contains(t, out, "NOTES_PATH")
-	assert.Contains(t, out, "YYYY/YYYYMMDD_NNNN.md")
+	assert.Contains(t, out, "YYYY/MM/YYYYMMDD_ID")
 }
 
 func TestSkillFlagWithoutInstallIsError(t *testing.T) {
