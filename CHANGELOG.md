@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-05-14
+
+### Added
+
+- `notes skill` prints an AI-assistant skill document describing how to drive the CLI. The skill is authored as a markdown file in the repository and embedded into the binary at build time, so the same bytes ship with every copy of a given build. Pass `--install` to write the skill into a known agent location (currently `~/.claude/skills/notes/SKILL.md`), with `--agent`, `--force`, and `--dry-run` for the usual safety controls; without `--agent` the command auto-detects installed agents.
+
 ## [0.4.0] - 2026-05-11
 
 ### Added
