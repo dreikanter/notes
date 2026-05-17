@@ -346,6 +346,7 @@ func (s *OSStore) readEntry(r fileRef) (Entry, error) {
 	meta := frontmatterToMeta(fm, r, info.ModTime(), body)
 	return Entry{
 		ID:   r.id,
+		UID:  UID(r.date, r.id),
 		Meta: meta,
 		Body: string(body),
 	}, nil
@@ -438,20 +439,28 @@ func (s *OSStore) Put(entry Entry) (Entry, error) {
 	}
 
 	entry.Meta.UpdatedAt = now
+	entry.UID = UID(entry.Meta.CreatedAt.Format(DateFormat), entry.ID)
 	return entry, nil
 }
 
 // AbsPath returns the absolute path the store would use for entry given its
-// current Meta.CreatedAt, ID, and Meta.Slug. It derives the path purely from
-// the entry's fields — no I/O.
+// current UID (or Meta.CreatedAt when UID is empty), ID, Slug, and Type. It
+// derives the path purely from the entry's fields — no I/O.
 func (s *OSStore) AbsPath(entry Entry) string {
-	_, abs := s.pathFor(entry)
+	date := entry.Meta.CreatedAt.Format(DateFormat)
+	if uidDate, ok := UIDDate(entry.UID); ok {
+		date = uidDate
+	}
+	_, abs := s.pathForDate(entry, date)
 	return abs
 }
 
 // pathFor returns the rel/abs path the filename layout produces for entry.
 func (s *OSStore) pathFor(entry Entry) (rel, abs string) {
-	date := entry.Meta.CreatedAt.Format(DateFormat)
+	return s.pathForDate(entry, entry.Meta.CreatedAt.Format(DateFormat))
+}
+
+func (s *OSStore) pathForDate(entry Entry, date string) (rel, abs string) {
 	name := Filename(date, entry.ID, entry.Meta.Slug, entry.Meta.Type)
 	dir := DirPath(s.root, date)
 	abs = filepath.Join(dir, name)

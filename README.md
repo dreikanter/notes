@@ -65,9 +65,11 @@ notes resolve --type todo        # most recent note of that type
 notes resolve --slug meeting     # most recent note with that slug
 notes resolve --tag work         # most recent note with that tag
 
-# Read a note by numeric ID
+# Read one or more notes by numeric ID
 notes read 8823
+notes read 8823 8818
 notes read 8823 --no-frontmatter
+notes read 8823 8818 --json
 
 # Fill empty frontmatter (title, description, tags) using Claude Code CLI
 notes annotate 8823

@@ -2,11 +2,15 @@
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-05-17
+
 ### Added
 
+- `notes read` accepts multiple IDs and adds `--json` output for machine-readable note records ([#285]).
 - `notes ls --public` filters the list to notes whose frontmatter sets `public: true` ([#284]).
 
 [#284]: https://github.com/dreikanter/notes/pull/284
+[#285]: https://github.com/dreikanter/notes/pull/285
 
 ## [0.4.2] - 2026-05-14
 

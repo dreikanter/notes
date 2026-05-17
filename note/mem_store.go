@@ -101,6 +101,9 @@ func (s *MemStore) Put(entry Entry) (Entry, error) {
 	if entry.Meta.CreatedAt.IsZero() {
 		return Entry{}, fmt.Errorf("note %d: CreatedAt is zero", entry.ID)
 	}
+	if entry.UID == "" {
+		entry.UID = UID(entry.Meta.CreatedAt.Format(DateFormat), entry.ID)
+	}
 	entry.Meta.UpdatedAt = now
 	s.entries[entry.ID] = entry
 	return entry, nil

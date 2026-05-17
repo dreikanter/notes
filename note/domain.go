@@ -5,6 +5,7 @@ import "time"
 // Entry is the single domain object that Store implementations work with.
 type Entry struct {
 	ID   int
+	UID  string // stable filename-derived reference: YYYYMMDD_ID
 	Meta Meta
 	Body string
 }

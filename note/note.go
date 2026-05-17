@@ -101,12 +101,23 @@ func ParseFilename(baseName string) (ref, error) {
 	}, nil
 }
 
+// UID returns the stable filename-derived reference for date and id.
+func UID(date string, id int) string {
+	return fmt.Sprintf("%s_%d", date, id)
+}
+
+// UIDDate returns the date prefix from uid.
+func UIDDate(uid string) (string, bool) {
+	date, _, ok := strings.Cut(uid, "_")
+	return date, ok && len(date) >= 5 && IsDigits(date)
+}
+
 // Filename generates a note filename from date, id, optional slug, and optional type.
 // Type is encoded as a secondary file extension (e.g. ".todo.md") only when it's
 // safe to round-trip through ParseFilename; values with '.' or path separators
 // are omitted from the filename, with frontmatter remaining canonical.
 func Filename(date string, id int, slug, noteType string) string {
-	base := fmt.Sprintf("%s_%d", date, id)
+	base := UID(date, id)
 	if slug != "" {
 		base = fmt.Sprintf("%s_%s", base, slug)
 	}
