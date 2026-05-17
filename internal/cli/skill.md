@@ -72,10 +72,12 @@ notes ls --today
 
 ```sh
 notes read 8823
+notes read 8823 8818
 notes read 8823 --no-frontmatter
+notes read 8823 8818 --json
 ```
 
-`notes read` requires a numeric ID. Compose with `ls` or `resolve` to read a filtered note:
+`notes read` requires one or more numeric IDs. Use `--json` to emit a JSON array containing parsed metadata and Markdown body. Compose with `ls` or `resolve` to read filtered notes:
 
 ```sh
 # Read the most recent todo
