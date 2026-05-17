@@ -18,13 +18,14 @@ var lsCmd = &cobra.Command{
 		slug, _ := cmd.Flags().GetString("slug")
 		tags, _ := cmd.Flags().GetStringSlice("tag")
 		today, _ := cmd.Flags().GetBool("today")
+		publicOnly, _ := cmd.Flags().GetBool("public")
 
 		store, err := notesStore()
 		if err != nil {
 			return err
 		}
 
-		ids, err := lsIDs(store, noteType, slug, tags, today)
+		ids, err := lsIDs(store, noteType, slug, tags, today, publicOnly)
 		if err != nil {
 			return err
 		}
@@ -43,8 +44,8 @@ var lsCmd = &cobra.Command{
 // lsIDs returns the IDs to print. With no filter flags it takes the fast
 // directory-scan path via Store.IDs; otherwise it builds a QueryOpt list
 // and delegates to Store.All.
-func lsIDs(store note.Store, noteType, slug string, tags []string, today bool) ([]int, error) {
-	if noteType == "" && slug == "" && len(tags) == 0 && !today {
+func lsIDs(store note.Store, noteType, slug string, tags []string, today, publicOnly bool) ([]int, error) {
+	if noteType == "" && slug == "" && len(tags) == 0 && !today && !publicOnly {
 		return store.IDs()
 	}
 	var opts []note.QueryOpt
@@ -59,6 +60,9 @@ func lsIDs(store note.Store, noteType, slug string, tags []string, today bool) (
 	}
 	if today {
 		opts = append(opts, note.WithExactDate(time.Now()))
+	}
+	if publicOnly {
+		opts = append(opts, note.WithPublic(true))
 	}
 	entries, err := store.All(opts...)
 	if err != nil {
@@ -77,6 +81,7 @@ func registerLsFlags() {
 	lsCmd.Flags().String("slug", "", "filter by exact slug")
 	lsCmd.Flags().StringSlice("tag", nil, "filter by tag (repeatable, all must match)")
 	lsCmd.Flags().Bool("today", false, "only list notes created today")
+	lsCmd.Flags().Bool("public", false, "only list public notes")
 }
 
 func init() {

@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+
+- `notes ls --public` filters the list to notes whose frontmatter sets `public: true` ([#284]).
+
+[#284]: https://github.com/dreikanter/notes/pull/284
+
 ## [0.4.2] - 2026-05-14
 
 ### Added
