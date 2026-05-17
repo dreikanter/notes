@@ -55,6 +55,7 @@ notes ls --type todo
 notes ls --slug meeting
 notes ls --tag work
 notes ls --tag work --tag meeting     # multiple --tag flags are ANDed
+notes ls --public
 notes ls --today
 
 # Resolve a note and print its absolute path (exactly one lookup flag, or none)

@@ -58,10 +58,11 @@ notes new-todo
 # Most recent IDs, newest first
 notes ls --limit 10
 
-# Filter by type, slug, or tag (--tag is repeatable; tags AND together)
+# Filter by type, slug, tag, or public status (--tag is repeatable; tags AND together)
 notes ls --type todo --limit 1
 notes ls --slug report
 notes ls --tag journal --tag idea
+notes ls --public
 
 # Only today's notes
 notes ls --today

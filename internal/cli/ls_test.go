@@ -2,6 +2,8 @@ package cli
 
 import (
 	"bytes"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -11,8 +13,12 @@ import (
 
 func runLs(t *testing.T, args ...string) (string, error) {
 	t.Helper()
+	return runLsInRoot(t, testdataPath(t), args...)
+}
 
-	root := testdataPath(t)
+func runLsInRoot(t *testing.T, root string, args ...string) (string, error) {
+	t.Helper()
+
 	lsCmd.ResetFlags()
 	registerLsFlags()
 
@@ -34,6 +40,41 @@ func TestLsNoArgs(t *testing.T) {
 	for _, line := range lines {
 		assert.True(t, allDigits(line), "expected integer ID per line, got %q", line)
 	}
+}
+
+func TestLsPublicFilter(t *testing.T) {
+	root := copyTestdata(t)
+	markFixturePublic(t, root, "2026/01/20260106_8823_999.md")
+	markFixturePublic(t, root, "2026/01/20260102_8814.todo.md")
+
+	tests := []struct {
+		name    string
+		args    []string
+		wantIDs []string
+	}{
+		{name: "public", args: []string{"--public"}, wantIDs: []string{"8823", "8814"}},
+		{name: "public and tag", args: []string{"--public", "--tag", "planning"}, wantIDs: []string{"8814"}},
+		{name: "public and type", args: []string{"--public", "--type", "todo"}, wantIDs: []string{"8814"}},
+		{name: "public and tag no overlap", args: []string{"--public", "--tag", "meeting"}, wantIDs: nil},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			out, err := runLsInRoot(t, root, tt.args...)
+			require.NoError(t, err)
+			assert.Equal(t, tt.wantIDs, outputLines(out))
+		})
+	}
+}
+
+func markFixturePublic(t *testing.T, root, rel string) {
+	t.Helper()
+	path := filepath.Join(root, filepath.FromSlash(rel))
+	data, err := os.ReadFile(path)
+	require.NoError(t, err)
+	updated := strings.Replace(string(data), "---\n", "---\npublic: true\n", 1)
+	require.NotEqual(t, string(data), updated)
+	require.NoError(t, os.WriteFile(path, []byte(updated), 0o644))
 }
 
 func TestLsFilters(t *testing.T) {
