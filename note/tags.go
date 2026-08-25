@@ -3,7 +3,8 @@ package note
 import (
 	"bytes"
 	"fmt"
-	"sort"
+	"maps"
+	"slices"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -260,12 +261,7 @@ func computeMergedTags(fmTags, bodyHashtags []string) []string {
 	if len(set) == 0 {
 		return nil
 	}
-	out := make([]string, 0, len(set))
-	for t := range set {
-		out = append(out, t)
-	}
-	sort.Strings(out)
-	return out
+	return slices.Sorted(maps.Keys(set))
 }
 
 // normalizeHashtags lowercases and deduplicates a hashtag list from
@@ -285,10 +281,5 @@ func normalizeHashtags(raw []string) []string {
 	if len(set) == 0 {
 		return nil
 	}
-	out := make([]string, 0, len(set))
-	for t := range set {
-		out = append(out, t)
-	}
-	sort.Strings(out)
-	return out
+	return slices.Sorted(maps.Keys(set))
 }

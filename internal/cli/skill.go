@@ -7,7 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"sort"
+	"slices"
 	"strings"
 	"text/tabwriter"
 
@@ -182,12 +182,11 @@ func validateSkillFlags() error {
 }
 
 func findTarget(name string) *installTarget {
-	for i := range targets {
-		if targets[i].Name == name {
-			return &targets[i]
-		}
+	i := slices.IndexFunc(targets, func(t installTarget) bool { return t.Name == name })
+	if i < 0 {
+		return nil
 	}
-	return nil
+	return &targets[i]
 }
 
 func targetNamesList() string {
@@ -195,7 +194,7 @@ func targetNamesList() string {
 	for i, t := range targets {
 		names[i] = t.Name
 	}
-	sort.Strings(names)
+	slices.Sort(names)
 	return strings.Join(names, ", ")
 }
 

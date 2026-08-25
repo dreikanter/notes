@@ -2,7 +2,8 @@ package cli
 
 import (
 	"fmt"
-	"sort"
+	"maps"
+	"slices"
 
 	"github.com/dreikanter/notes/note"
 	"github.com/spf13/cobra"
@@ -139,13 +140,8 @@ func runTagsList(cmd *cobra.Command) error {
 			set[t] = struct{}{}
 		}
 	}
-	tags := make([]string, 0, len(set))
-	for t := range set {
-		tags = append(tags, t)
-	}
-	sort.Strings(tags)
 	out := cmd.OutOrStdout()
-	for _, t := range tags {
+	for _, t := range slices.Sorted(maps.Keys(set)) {
 		fmt.Fprintln(out, t)
 	}
 	return nil

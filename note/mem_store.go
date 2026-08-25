@@ -1,8 +1,9 @@
 package note
 
 import (
+	"cmp"
 	"fmt"
-	"sort"
+	"slices"
 	"sync"
 	"time"
 )
@@ -147,7 +148,7 @@ func (s *MemStore) Reconcile(known map[int]time.Time) (Diff, error) {
 	}
 	s.sortEntriesByRecency(diff.Added)
 	s.sortEntriesByRecency(diff.Updated)
-	sort.Ints(diff.Removed)
+	slices.Sort(diff.Removed)
 	return diff, nil
 }
 
@@ -168,9 +169,7 @@ func (s *MemStore) matchLocked(q query) []Entry {
 func (s *MemStore) nextIDLocked() int {
 	highest := 0
 	for id := range s.entries {
-		if id > highest {
-			highest = id
-		}
+		highest = max(highest, id)
 	}
 	return highest + 1
 }
@@ -178,22 +177,16 @@ func (s *MemStore) nextIDLocked() int {
 // sortIDsLocked sorts ids newest-first by the entries' CreatedAt, tie-breaking
 // on higher ID first. Caller holds s.mu for read.
 func (s *MemStore) sortIDsLocked(ids []int) {
-	sort.Slice(ids, func(i, j int) bool {
-		ei, ej := s.entries[ids[i]], s.entries[ids[j]]
-		if !ei.Meta.CreatedAt.Equal(ej.Meta.CreatedAt) {
-			return ei.Meta.CreatedAt.After(ej.Meta.CreatedAt)
-		}
-		return ids[i] > ids[j]
+	slices.SortFunc(ids, func(a, b int) int {
+		ea, eb := s.entries[a], s.entries[b]
+		return cmp.Or(eb.Meta.CreatedAt.Compare(ea.Meta.CreatedAt), cmp.Compare(b, a))
 	})
 }
 
 // sortEntriesByRecency sorts entries newest-first by CreatedAt with the same
 // tie-break as sortIDsLocked.
 func (s *MemStore) sortEntriesByRecency(entries []Entry) {
-	sort.Slice(entries, func(i, j int) bool {
-		if !entries[i].Meta.CreatedAt.Equal(entries[j].Meta.CreatedAt) {
-			return entries[i].Meta.CreatedAt.After(entries[j].Meta.CreatedAt)
-		}
-		return entries[i].ID > entries[j].ID
+	slices.SortFunc(entries, func(a, b Entry) int {
+		return cmp.Or(b.Meta.CreatedAt.Compare(a.Meta.CreatedAt), cmp.Compare(b.ID, a.ID))
 	})
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/dreikanter/notes/note"
 	"github.com/spf13/cobra"
@@ -106,7 +107,7 @@ func writeReadJSON(cmd *cobra.Command, entries []note.Entry) error {
 			Title:       entry.Meta.Title,
 			Slug:        entry.Meta.Slug,
 			Tags:        jsonTags(entry.Meta.Tags),
-			Date:        entry.Meta.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			Date:        entry.Meta.CreatedAt.Format(time.RFC3339),
 			Description: entry.Meta.Description,
 			Public:      entry.Meta.Public,
 			Body:        entry.Body,

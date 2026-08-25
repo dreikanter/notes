@@ -157,8 +157,7 @@ func runClaude(ctx context.Context, model, schema, prompt string) ([]byte, error
 			return nil, fmt.Errorf("claude failed: %s", s)
 		}
 		exitCode := -1
-		var ee *exec.ExitError
-		if errors.As(err, &ee) {
+		if ee, ok := errors.AsType[*exec.ExitError](err); ok {
 			exitCode = ee.ExitCode()
 		}
 		if out := stdout.String(); out != "" {
