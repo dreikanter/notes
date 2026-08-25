@@ -3,6 +3,7 @@ package note
 import (
 	"fmt"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
@@ -17,19 +18,12 @@ var typesWithSpecialBehavior = []string{"todo", "backlog", "weekly"}
 // types with notes-specific handling. The returned slice may be freely
 // mutated without affecting the package-internal list.
 func SpecialBehaviorTypes() []string {
-	out := make([]string, len(typesWithSpecialBehavior))
-	copy(out, typesWithSpecialBehavior)
-	return out
+	return slices.Clone(typesWithSpecialBehavior)
 }
 
 // HasSpecialBehavior reports whether s is a type with special notes behavior.
 func HasSpecialBehavior(s string) bool {
-	for _, t := range typesWithSpecialBehavior {
-		if s == t {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(typesWithSpecialBehavior, s)
 }
 
 // ref is a filename-derived reference to a single note file in the store: the

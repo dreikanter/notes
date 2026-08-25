@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -326,10 +327,8 @@ func coalesceWatchEvent(pending map[int]Event, order []int, next Event) []int {
 }
 
 func appendWatchOrder(order []int, id int) []int {
-	for _, existing := range order {
-		if existing == id {
-			return order
-		}
+	if slices.Contains(order, id) {
+		return order
 	}
 	return append(order, id)
 }

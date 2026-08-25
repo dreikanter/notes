@@ -2,6 +2,7 @@ package note
 
 import (
 	"regexp"
+	"slices"
 	"strings"
 )
 
@@ -90,8 +91,7 @@ type RolloverResult struct {
 // RolloverTasks determines which tasks to carry over and produces the modified previous todo.
 func RolloverTasks(prevLines []string) RolloverResult {
 	tasks := ExtractTasks(prevLines)
-	updated := make([]string, len(prevLines))
-	copy(updated, prevLines)
+	updated := slices.Clone(prevLines)
 
 	seen := make(map[string]bool) // normalized task text to prevent duplicates
 	var carried []Task

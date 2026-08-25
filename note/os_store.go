@@ -1,12 +1,13 @@
 package note
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -54,11 +55,8 @@ func (r fileRef) absPath(root string) string { return filepath.Join(root, r.relP
 // lexicographic ordering on the filename is not reliable because "_9_" sorts
 // after "_10_" while ID 10 is newer.
 func sortByRecency(refs []fileRef) {
-	sort.Slice(refs, func(i, j int) bool {
-		if refs[i].date != refs[j].date {
-			return refs[i].date > refs[j].date
-		}
-		return refs[i].id > refs[j].id
+	slices.SortFunc(refs, func(a, b fileRef) int {
+		return cmp.Or(cmp.Compare(b.date, a.date), cmp.Compare(b.id, a.id))
 	})
 }
 
@@ -188,7 +186,7 @@ func (s *OSStore) Reconcile(known map[int]time.Time) (Diff, error) {
 			diff.Removed = append(diff.Removed, id)
 		}
 	}
-	sort.Ints(diff.Removed)
+	slices.Sort(diff.Removed)
 	return diff, nil
 }
 
@@ -488,7 +486,7 @@ func frontmatterToMeta(fm frontmatter, r fileRef, modTime time.Time, body []byte
 		DateExplicit: dateExplicit,
 		UpdatedAt:    modTime,
 		Tags:         computeMergedTags(fm.Tags, normalizeHashtags(ExtractHashtags(body))),
-		Aliases:      append([]string(nil), fm.Aliases...),
+		Aliases:      slices.Clone(fm.Aliases),
 		Description:  fm.Description,
 		Public:       fm.Public,
 		Extra:        extraFromYAML(fm.Extra),
@@ -502,14 +500,8 @@ func frontmatterToMeta(fm frontmatter, r fileRef, modTime time.Time, body []byte
 // defaulted dates stay implicit and consumers reconstruct them from the
 // filename per SCHEMA.md.
 func metaToFrontmatter(m Meta) frontmatter {
-	var aliases []string
-	if len(m.Aliases) > 0 {
-		aliases = append([]string(nil), m.Aliases...)
-	}
-	var tags []string
-	if len(m.Tags) > 0 {
-		tags = append([]string(nil), m.Tags...)
-	}
+	aliases := slices.Clone(m.Aliases)
+	tags := slices.Clone(m.Tags)
 	var date time.Time
 	if m.DateExplicit {
 		date = m.CreatedAt

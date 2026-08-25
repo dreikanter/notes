@@ -3,7 +3,8 @@ package note
 import (
 	"bytes"
 	"fmt"
-	"sort"
+	"maps"
+	"slices"
 	"time"
 
 	"gopkg.in/yaml.v3"
@@ -110,7 +111,7 @@ func (f *frontmatter) UnmarshalYAML(node *yaml.Node) error {
 // MarshalYAML composes a mapping node with reserved fields first (in fixed
 // order) and Extra keys alpha-sorted. Zero-valued reserved fields are omitted,
 // matching the `omitempty` struct-tag discipline.
-func (f frontmatter) MarshalYAML() (interface{}, error) {
+func (f frontmatter) MarshalYAML() (any, error) {
 	node := &yaml.Node{Kind: yaml.MappingNode}
 
 	appendString := func(key, value string) {
@@ -176,12 +177,7 @@ func (f frontmatter) MarshalYAML() (interface{}, error) {
 	appendBool("public", f.Public)
 
 	if len(f.Extra) > 0 {
-		keys := make([]string, 0, len(f.Extra))
-		for k := range f.Extra {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-		for _, k := range keys {
+		for _, k := range slices.Sorted(maps.Keys(f.Extra)) {
 			v := f.Extra[k]
 			node.Content = append(node.Content,
 				&yaml.Node{Kind: yaml.ScalarNode, Value: k},
