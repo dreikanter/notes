@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-08-25
+
 ### Changed
 
 - The module now targets Go 1.27; building `notes` from source requires that toolchain. `golangci-lint` is upgraded to v2.13.1 because v2.12.2 panics analysing the Go 1.27 standard library ([#289]).
