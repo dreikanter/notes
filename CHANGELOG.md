@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Changed
+
+- The module now targets Go 1.27; building `notes` from source requires that toolchain. `golangci-lint` is upgraded to v2.13.1 because v2.12.2 panics analysing the Go 1.27 standard library.
+- Dropped `golang.org/x/sync` from the module's dependencies: the concurrent note reader now uses the standard library's `sync.WaitGroup.Go` instead of `errgroup`.
+- The concurrent read path sizes its worker pool from `GOMAXPROCS` rather than `NumCPU`, so a container CPU quota is respected, and a read error is now reported for the first failing note in scan order instead of whichever worker happened to fail first.
+
 ## [0.5.1] - 2026-08-19
 
 ### Changed
