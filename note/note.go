@@ -58,13 +58,10 @@ func ParseFilename(baseName string) (ref, error) {
 	// Only treat the dot-suffix as a type if the remaining base is itself
 	// dot-free — i.e. the suffix round-trips through Filename. Otherwise
 	// leave Type empty and let the caller rely on frontmatter.
-	if idx := strings.LastIndex(baseName, "."); idx >= 0 {
-		suffix := baseName[idx+1:]
-		prefix := baseName[:idx]
-		if filenameRoundtripSafeType(suffix) && !strings.Contains(prefix, ".") {
-			noteType = suffix
-			remaining = prefix
-		}
+	if prefix, suffix, ok := strings.CutLast(baseName, "."); ok &&
+		filenameRoundtripSafeType(suffix) && !strings.Contains(prefix, ".") {
+		noteType = suffix
+		remaining = prefix
 	}
 
 	parts := strings.SplitN(remaining, "_", 3)
