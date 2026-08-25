@@ -245,6 +245,42 @@ func TestOSStore_AllFilterByPublic(t *testing.T) {
 	assert.False(t, priv[0].Meta.Public)
 }
 
+func TestOSStore_AllOrderIsIndependentOfWorkerScheduling(t *testing.T) {
+	s := newOSTestStore(t)
+
+	day := time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC)
+	const count = 64 // comfortably more than GOMAXPROCS on any CI runner
+	for range count {
+		_, err := s.Put(Entry{Meta: Meta{Tags: []string{"bulk"}, CreatedAt: day}, Body: "x"})
+		require.NoError(t, err)
+	}
+
+	want := make([]int, count)
+	for i := range want {
+		want[i] = count - i // newest (highest ID) first
+	}
+
+	entries, err := s.All(WithTag("bulk"))
+	require.NoError(t, err)
+	assertEntryIDs(t, want, entries)
+}
+
+func TestOSStore_AllReportsFirstUnreadableNoteInScanOrder(t *testing.T) {
+	s := newOSTestStore(t)
+	dir := filepath.Join(s.Root(), "2026", "01")
+	require.NoError(t, os.MkdirAll(dir, 0o755))
+
+	// Two notes with malformed YAML frontmatter. Scan order is newest-first,
+	// so the higher ID is reported no matter which worker reads it first.
+	broken := []byte("---\ntitle: [unterminated\n---\n\nbody\n")
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "20260101_1.md"), broken, 0o644))
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "20260101_2.md"), broken, 0o644))
+
+	_, err := s.All()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "20260101_2.md")
+}
+
 func TestOSStore_ReconcileUnchangedSkipsFileReadAndParse(t *testing.T) {
 	s := newOSTestStore(t)
 	entry, err := s.Put(Entry{Meta: Meta{CreatedAt: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)}, Body: "body"})

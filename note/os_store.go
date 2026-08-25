@@ -1,7 +1,6 @@
 package note
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -10,9 +9,9 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
-	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v3"
 )
 
@@ -281,47 +280,38 @@ func (s *OSStore) collect(opts []QueryOpt, firstOnly bool) ([]Entry, error) {
 }
 
 // readConcurrent reads each fileRef via a worker pool and returns entries
-// in the same order as refs.
+// in the same order as refs. Every ref is read even when one fails; the
+// first error in refs order is returned, so the result does not depend on
+// which worker lost the race.
 func (s *OSStore) readConcurrent(refs []fileRef) ([]Entry, error) {
 	if len(refs) == 0 {
 		return nil, nil
 	}
-	workers := runtime.NumCPU()
-	if workers > len(refs) {
-		workers = len(refs)
-	}
 
 	entries := make([]Entry, len(refs))
-	g, ctx := errgroup.WithContext(context.Background())
+	errs := make([]error, len(refs))
 	jobs := make(chan int)
 
-	g.Go(func() error {
-		defer close(jobs)
-		for i := range refs {
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			case jobs <- i:
-			}
-		}
-		return nil
-	})
-
-	for w := 0; w < workers; w++ {
-		g.Go(func() error {
+	// GOMAXPROCS rather than NumCPU: it honours a cgroup CPU limit, so a
+	// containerised run does not oversubscribe its quota.
+	var wg sync.WaitGroup
+	for range min(runtime.GOMAXPROCS(0), len(refs)) {
+		wg.Go(func() {
 			for i := range jobs {
-				entry, err := s.readEntry(refs[i])
-				if err != nil {
-					return err
-				}
-				entries[i] = entry
+				entries[i], errs[i] = s.readEntry(refs[i])
 			}
-			return nil
 		})
 	}
+	for i := range refs {
+		jobs <- i
+	}
+	close(jobs)
+	wg.Wait()
 
-	if err := g.Wait(); err != nil {
-		return nil, err
+	for _, err := range errs {
+		if err != nil {
+			return nil, err
+		}
 	}
 	return entries, nil
 }
